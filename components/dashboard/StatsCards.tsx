@@ -20,7 +20,7 @@ interface StatProps {
 
 const toneStyles: Record<StatProps["tone"], string> = {
   accent: "bg-[var(--color-accent-soft)] text-[var(--color-accent)]",
-  warning: "bg-[rgba(245,158,11,0.12)] text-[var(--color-warning)]",
+  warning: "bg-[var(--color-warning-soft)] text-[var(--color-warning)]",
   muted: "bg-[var(--color-surface)] text-[var(--color-text-muted)]",
   violet: "bg-[rgba(167,139,250,0.12)] text-violet-300",
 };

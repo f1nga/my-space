@@ -53,7 +53,7 @@ export function DayCell({
             className={cn(
               "grid h-6 w-6 place-items-center rounded-full text-xs font-semibold transition-colors hover:bg-[var(--color-surface)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)]",
               isToday
-                ? "bg-[var(--color-accent)] text-zinc-950 hover:bg-[var(--color-accent-hover)]"
+                ? "bg-[var(--color-accent)] text-[var(--color-accent-foreground)] hover:bg-[var(--color-accent-hover)]"
                 : "text-[var(--color-text-muted)]",
             )}
             aria-label={`Veure dia ${day.toLocaleDateString("ca-ES")}`}

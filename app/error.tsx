@@ -16,7 +16,7 @@ export default function RootError({ error, reset }: ErrorProps) {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 text-center">
-      <span className="grid h-14 w-14 place-items-center rounded-2xl bg-[rgba(244,63,94,0.12)] text-[var(--color-danger)]">
+      <span className="grid h-14 w-14 place-items-center rounded-2xl bg-[var(--color-danger-soft)] text-[var(--color-danger)]">
         <AlertTriangle className="h-6 w-6" aria-hidden />
       </span>
       <div className="space-y-1">

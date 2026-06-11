@@ -87,9 +87,9 @@ export function TaskCard({ task, isOverlay = false }: TaskCardProps) {
                 className={cn(
                   "mt-2 inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-medium",
                   due.tone === "danger" &&
-                    "bg-[rgba(244,63,94,0.12)] text-[var(--color-danger)]",
+                    "bg-[var(--color-danger-soft)] text-[var(--color-danger)]",
                   due.tone === "warning" &&
-                    "bg-[rgba(245,158,11,0.12)] text-[var(--color-warning)]",
+                    "bg-[var(--color-warning-soft)] text-[var(--color-warning)]",
                   due.tone === "muted" &&
                     "bg-[var(--color-surface)] text-[var(--color-text-muted)]",
                 )}
@@ -118,7 +118,7 @@ export function TaskCard({ task, isOverlay = false }: TaskCardProps) {
                   await deleteTask(task.id);
                 });
               }}
-              className="rounded p-1 text-[var(--color-text-muted)] hover:bg-[rgba(244,63,94,0.1)] hover:text-[var(--color-danger)] disabled:opacity-40"
+              className="rounded p-1 text-[var(--color-text-muted)] hover:bg-[var(--color-danger-soft)] hover:text-[var(--color-danger)] disabled:opacity-40"
             >
               <Trash2 className="h-3.5 w-3.5" aria-hidden />
             </button>

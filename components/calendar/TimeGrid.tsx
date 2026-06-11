@@ -148,14 +148,14 @@ export function AllDayLane({
                 key={item.id}
                 type="button"
                 onClick={() => onEventClick(item)}
-                className="truncate rounded-md bg-emerald-500 px-2 py-0.5 text-[11px] font-medium text-white hover:opacity-90"
+                className="truncate rounded-md bg-[var(--color-accent)] px-2 py-0.5 text-[11px] font-medium text-[var(--color-accent-foreground)] hover:opacity-90"
               >
                 {item.title}
               </button>
             ) : (
               <span
                 key={item.id}
-                className="truncate rounded-md bg-zinc-700 px-2 py-0.5 text-[11px] font-medium text-zinc-100"
+                className="truncate rounded-md bg-[var(--color-surface)] px-2 py-0.5 text-[11px] font-medium text-[var(--color-text)]"
               >
                 {item.title}
               </span>

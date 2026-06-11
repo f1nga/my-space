@@ -44,8 +44,7 @@ export function CalendarItemChip({
       <Link
         href="/board"
         className={cn(
-          "block truncate rounded-md px-1.5 py-0.5 text-[11px] font-medium text-zinc-100 transition-colors hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--color-accent)]",
-          "bg-zinc-700",
+          "block truncate rounded-md bg-[var(--color-surface)] px-1.5 py-0.5 text-[11px] font-medium text-[var(--color-text)] transition-colors hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--color-accent)]",
         )}
         aria-label={label}
         title={item.title}
@@ -63,7 +62,7 @@ export function CalendarItemChip({
         onEventClick?.(item);
       }}
       className={cn(
-        "block w-full truncate rounded-md px-1.5 py-0.5 text-left text-[11px] font-medium text-white transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--color-accent)]",
+        "block w-full truncate rounded-md px-1.5 py-0.5 text-left text-[11px] font-medium text-[var(--color-accent-foreground)] transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--color-accent)]",
         colorClass(item.color),
       )}
       aria-label={label}
