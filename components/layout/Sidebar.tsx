@@ -8,6 +8,7 @@ import {
   CalendarDays,
   StickyNote,
   Sparkles,
+  Target,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
@@ -23,6 +24,7 @@ const NAV: NavItem[] = [
   { href: "/board", label: "Tauler", icon: KanbanSquare },
   { href: "/calendar", label: "Calendari", icon: CalendarDays },
   { href: "/notes", label: "Notes", icon: StickyNote },
+  { href: "/objectius", label: "Objectius", icon: Target },
 ];
 
 export function Sidebar() {
