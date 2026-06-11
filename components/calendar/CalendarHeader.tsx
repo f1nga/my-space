@@ -12,12 +12,18 @@ import {
   type CalendarView,
 } from "@/lib/calendar";
 import { cn } from "@/lib/utils";
-import { EventDialog } from "./EventDialog";
+import { EventFormDialog } from "./EventFormDialog";
 
 interface CalendarHeaderProps {
   date: Date;
   view: CalendarView;
 }
+
+const VIEW_OPTIONS: { value: CalendarView; label: string }[] = [
+  { value: "month", label: "Mes" },
+  { value: "week", label: "Setmana" },
+  { value: "day", label: "Dia" },
+];
 
 function buildHref(date: Date, view: CalendarView): string {
   const params = new URLSearchParams();
@@ -61,13 +67,18 @@ export function CalendarHeader({ date, view }: CalendarHeaderProps) {
         </h2>
 
         <div className="flex items-center gap-2">
-          <div className="inline-flex rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-0.5">
-            {(["month", "week"] as const).map((value) => {
+          <div
+            className="inline-flex rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-0.5"
+            role="group"
+            aria-label="Vista del calendari"
+          >
+            {VIEW_OPTIONS.map(({ value, label }) => {
               const isActive = view === value;
               return (
                 <Link
                   key={value}
                   href={buildHref(date, value)}
+                  aria-current={isActive ? "page" : undefined}
                   className={cn(
                     "rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
                     isActive
@@ -75,7 +86,7 @@ export function CalendarHeader({ date, view }: CalendarHeaderProps) {
                       : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]",
                   )}
                 >
-                  {value === "month" ? "Mes" : "Setmana"}
+                  {label}
                 </Link>
               );
             })}
@@ -86,7 +97,7 @@ export function CalendarHeader({ date, view }: CalendarHeaderProps) {
         </div>
       </div>
 
-      <EventDialog
+      <EventFormDialog
         open={createOpen}
         onClose={() => setCreateOpen(false)}
         defaultStart={date}

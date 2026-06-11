@@ -1,105 +1,101 @@
 "use client";
 
 import { useState } from "react";
-import { cn, formatTimeCa } from "@/lib/utils";
-import { calendarUtils, type CalendarItem } from "@/lib/calendar";
-import { EVENT_COLOR_CLASSES, EventDialog } from "./EventDialog";
-import type { EventColor } from "@/lib/types";
+import Link from "next/link";
+import { Plus } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { calendarUtils, toISODate, type CalendarItem } from "@/lib/calendar";
+import { CalendarItemChip } from "./CalendarItemChip";
+import { DayItemsPopover } from "./DayItemsPopover";
+
+const MAX_VISIBLE = 3;
 
 interface DayCellProps {
   day: Date;
   currentMonth: Date;
   items: CalendarItem[];
+  onCreate: (day: Date) => void;
+  onEventClick: (item: CalendarItem) => void;
 }
 
-function colorClass(color: string | null): string {
-  const colors = EVENT_COLOR_CLASSES as Record<EventColor, string>;
-  if (color && color in colors) {
-    return colors[color as EventColor];
-  }
-  return colors.emerald;
-}
-
-export function DayCell({ day, currentMonth, items }: DayCellProps) {
-  const [createOpen, setCreateOpen] = useState(false);
-  const [editing, setEditing] = useState<CalendarItem | null>(null);
+export function DayCell({
+  day,
+  currentMonth,
+  items,
+  onCreate,
+  onEventClick,
+}: DayCellProps) {
+  const [overflowOpen, setOverflowOpen] = useState(false);
   const isOutsideMonth = !calendarUtils.isSameMonth(day, currentMonth);
   const isToday = calendarUtils.isToday(day);
-  const visible = items.slice(0, 3);
+  const visible = items.slice(0, MAX_VISIBLE);
   const overflow = items.length - visible.length;
+
+  function handleCellClick(event: React.MouseEvent<HTMLDivElement>) {
+    const target = event.target as HTMLElement;
+    if (target.closest("a, button")) return;
+    onCreate(day);
+  }
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setCreateOpen(true)}
+      <div
+        role="gridcell"
+        onClick={handleCellClick}
         className={cn(
-          "group flex h-full min-h-[110px] flex-col gap-1 rounded-xl border border-[var(--color-border)]/60 bg-[var(--color-bg-elevated)]/40 p-2 text-left transition-colors hover:border-[var(--color-border-strong)] hover:bg-[var(--color-bg-elevated)]",
+          "group relative flex cursor-pointer h-full min-h-[110px] cursor-pointer flex-col gap-1 rounded-xl border border-[var(--color-border)]/60 bg-[var(--color-bg-elevated)]/40 p-2 transition-colors hover:border-[var(--color-border-strong)] hover:bg-[var(--color-bg-elevated)]",
           isOutsideMonth && "opacity-50",
         )}
-        aria-label={`Crear esdeveniment el ${day.toLocaleDateString("ca-ES")}`}
       >
         <div className="flex items-center justify-between">
-          <span
+          <Link
+            href={`/calendar?view=day&date=${toISODate(day)}`}
             className={cn(
-              "grid h-6 w-6 place-items-center rounded-full text-xs font-semibold",
+              "grid h-6 w-6 place-items-center rounded-full text-xs font-semibold transition-colors hover:bg-[var(--color-surface)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)]",
               isToday
-                ? "bg-[var(--color-accent)] text-zinc-950"
+                ? "bg-[var(--color-accent)] text-zinc-950 hover:bg-[var(--color-accent-hover)]"
                 : "text-[var(--color-text-muted)]",
             )}
+            aria-label={`Veure dia ${day.toLocaleDateString("ca-ES")}`}
           >
             {day.getDate()}
-          </span>
+          </Link>
+          <button
+            type="button"
+            onClick={() => onCreate(day)}
+            className="grid h-6 w-6 place-items-center rounded-md text-[var(--color-text-subtle)] opacity-0 transition-all hover:bg-[var(--color-surface)] hover:text-[var(--color-text)] focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)] group-hover:opacity-100 group-focus-within:opacity-100"
+            aria-label={`Crear esdeveniment el ${day.toLocaleDateString("ca-ES")}`}
+          >
+            <Plus className="h-3.5 w-3.5" aria-hidden />
+          </button>
         </div>
         <div className="space-y-1">
           {visible.map((item) => (
-            <span
+            <CalendarItemChip
               key={item.id}
-              onClick={(event) => {
-                event.stopPropagation();
-                if (item.kind === "event") setEditing(item);
-              }}
-              role={item.kind === "event" ? "button" : undefined}
-              className={cn(
-                "block truncate rounded-md px-1.5 py-0.5 text-[11px] font-medium text-white",
-                item.kind === "task" && "bg-zinc-700 text-zinc-100",
-                item.kind === "event" && colorClass(item.color),
-              )}
-              title={item.title}
-            >
-              {!item.allDay && item.kind === "event"
-                ? `${formatTimeCa(item.startsAt)} ${item.title}`
-                : item.title}
-            </span>
+              item={item}
+              onEventClick={onEventClick}
+            />
           ))}
           {overflow > 0 ? (
-            <span className="text-[10px] text-[var(--color-text-subtle)]">
+            <button
+              type="button"
+              onClick={() => setOverflowOpen(true)}
+              className="text-[10px] text-[var(--color-text-subtle)] transition-colors hover:text-[var(--color-text)] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--color-accent)]"
+              aria-label={`${overflow} elements mes aquest dia`}
+            >
               +{overflow} mes
-            </span>
+            </button>
           ) : null}
         </div>
-      </button>
+      </div>
 
-      <EventDialog
-        open={createOpen}
-        onClose={() => setCreateOpen(false)}
-        defaultStart={day}
-      />
-      <EventDialog
-        open={Boolean(editing)}
-        onClose={() => setEditing(null)}
-        event={
-          editing
-            ? {
-                id: editing.id,
-                title: editing.title,
-                startsAt: editing.startsAt,
-                endsAt: editing.endsAt,
-                allDay: editing.allDay,
-                color: editing.color,
-              }
-            : null
-        }
+      <DayItemsPopover
+        open={overflowOpen}
+        onClose={() => setOverflowOpen(false)}
+        day={day}
+        items={items}
+        onEventClick={onEventClick}
       />
     </>
   );
