@@ -1,0 +1,48 @@
+// My Space: esquema Prisma
+// Datasource: SQLite (local). Migracio futura a PostgreSQL: nomes cal
+// canviar `provider` i `DATABASE_URL`, afegir model `User` i camp `userId`.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Task {
+  id          String    @id @default(cuid())
+  title       String
+  description String?
+  // "todo" | "doing" | "done" — SQLite no suporta enum; validem amb Zod a lib/types.ts
+  status      String    @default("todo")
+  position    Float     @default(0)
+  dueDate     DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([status, position])
+}
+
+model Note {
+  id        String   @id @default(cuid())
+  title     String
+  content   String   @default("")
+  pinned    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Event {
+  id        String    @id @default(cuid())
+  title     String
+  startsAt  DateTime
+  endsAt    DateTime?
+  allDay    Boolean   @default(false)
+  color     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([startsAt])
+}
