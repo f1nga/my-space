@@ -52,7 +52,7 @@ function Stat({ href, label, value, helper, icon: Icon, tone }: StatProps) {
 
 export function StatsCards({ counts, notes, upcomingEvents }: StatsCardsProps) {
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <Stat
         href="/board"
         label="Per fer"
@@ -76,14 +76,6 @@ export function StatsCards({ counts, notes, upcomingEvents }: StatsCardsProps) {
         helper="Tasques completades"
         icon={CheckCircle2}
         tone="accent"
-      />
-      <Stat
-        href="/calendar"
-        label="Properes"
-        value={upcomingEvents}
-        helper={`${notes} notes guardades`}
-        icon={CalendarDays}
-        tone="violet"
       />
     </div>
   );
