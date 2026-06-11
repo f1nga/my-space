@@ -17,6 +17,7 @@ export async function createEvent(input: unknown): Promise<ActionResult> {
     await prisma.event.create({
       data: {
         title: data.title,
+        description: data.description ?? null,
         startsAt: data.startsAt,
         endsAt: data.endsAt ?? null,
         allDay: data.allDay,
@@ -39,6 +40,9 @@ export async function updateEvent(input: unknown): Promise<ActionResult> {
       where: { id },
       data: {
         ...(rest.title !== undefined && { title: rest.title }),
+        ...(rest.description !== undefined && {
+          description: rest.description ?? null,
+        }),
         ...(rest.startsAt !== undefined && { startsAt: rest.startsAt }),
         ...(rest.endsAt !== undefined && { endsAt: rest.endsAt ?? null }),
         ...(rest.allDay !== undefined && { allDay: rest.allDay }),

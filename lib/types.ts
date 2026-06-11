@@ -65,6 +65,7 @@ const requiredDate = z
 export const eventCreateSchema = z
   .object({
     title: z.string().trim().min(1, "El titol es obligatori").max(200),
+    description: z.string().trim().max(5000).optional().nullable(),
     startsAt: requiredDate,
     endsAt: optionalDate.optional(),
     allDay: z.boolean().default(false),
@@ -79,6 +80,7 @@ export type EventCreateInput = z.infer<typeof eventCreateSchema>;
 export const eventUpdateSchema = z.object({
   id: z.string().min(1),
   title: z.string().trim().min(1).max(200).optional(),
+  description: z.string().trim().max(5000).optional().nullable(),
   startsAt: requiredDate.optional(),
   endsAt: optionalDate.optional(),
   allDay: z.boolean().optional(),
