@@ -5,7 +5,7 @@ import { CalendarPlus, FilePlus, ListPlus } from "lucide-react";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { TaskFormDialog } from "@/components/board/TaskFormDialog";
-import { EventDialog } from "@/components/calendar/EventDialog";
+import { EventFormDialog } from "@/components/calendar/EventFormDialog";
 import { createNote } from "@/lib/actions/notes";
 import { useRouter } from "next/navigation";
 
@@ -41,7 +41,7 @@ export function QuickActions() {
       </CardBody>
 
       <TaskFormDialog open={taskOpen} onClose={() => setTaskOpen(false)} />
-      <EventDialog open={eventOpen} onClose={() => setEventOpen(false)} />
+      <EventFormDialog open={eventOpen} onClose={() => setEventOpen(false)} />
     </Card>
   );
 }
