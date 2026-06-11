@@ -98,3 +98,87 @@ export const EVENT_COLORS = [
   "zinc",
 ] as const;
 export type EventColor = (typeof EVENT_COLORS)[number];
+
+// ───── Objectius ─────
+export const CATEGORIES_OBJECTIU = [
+  "FISIC",
+  "MENTAL",
+  "DINERS",
+  "TREBALL",
+  "ALTRES",
+] as const;
+export type CategoriaObjectiu = (typeof CATEGORIES_OBJECTIU)[number];
+export const categoriaObjectiuSchema = z.enum(CATEGORIES_OBJECTIU);
+
+export const ESTATS_OBJECTIU = ["EN_PROGRES", "COMPLETAT", "ABANDONAT"] as const;
+export type EstatObjectiu = (typeof ESTATS_OBJECTIU)[number];
+export const estatObjectiuSchema = z.enum(ESTATS_OBJECTIU);
+
+export const CATEGORIA_OBJECTIU_LABELS: Record<CategoriaObjectiu, string> = {
+  FISIC: "Físic",
+  MENTAL: "Mental",
+  DINERS: "Diners",
+  TREBALL: "Treball",
+  ALTRES: "Altres",
+};
+
+export const ESTAT_OBJECTIU_LABELS: Record<EstatObjectiu, string> = {
+  EN_PROGRES: "En progrés",
+  COMPLETAT: "Completat",
+  ABANDONAT: "Abandonat",
+};
+
+const subObjectiuInputSchema = z.object({
+  titol: z.string().trim().min(1).max(200),
+});
+
+export const objectiuCreateSchema = z
+  .object({
+    titol: z.string().trim().min(1, "El títol és obligatori").max(200),
+    descripcio: z.string().trim().max(2000).optional().nullable(),
+    dataInici: requiredDate,
+    dataFinal: requiredDate,
+    categoria: categoriaObjectiuSchema,
+    progress: z.number().int().min(0).max(100).default(0),
+    subtasques: z.array(subObjectiuInputSchema).max(20).default([]),
+  })
+  .refine((data) => data.dataFinal.getTime() >= data.dataInici.getTime(), {
+    message: "La data final no pot ser anterior a la inicial",
+    path: ["dataFinal"],
+  });
+export type ObjectiuCreateInput = z.infer<typeof objectiuCreateSchema>;
+
+export const objectiuUpdateSchema = z
+  .object({
+    id: z.string().min(1),
+    titol: z.string().trim().min(1).max(200).optional(),
+    descripcio: z.string().trim().max(2000).optional().nullable(),
+    dataInici: requiredDate.optional(),
+    dataFinal: requiredDate.optional(),
+    categoria: categoriaObjectiuSchema.optional(),
+    estat: estatObjectiuSchema.optional(),
+    progress: z.number().int().min(0).max(100).optional(),
+  })
+  .refine(
+    (data) => {
+      if (!data.dataInici || !data.dataFinal) return true;
+      return data.dataFinal.getTime() >= data.dataInici.getTime();
+    },
+    {
+      message: "La data final no pot ser anterior a la inicial",
+      path: ["dataFinal"],
+    },
+  );
+export type ObjectiuUpdateInput = z.infer<typeof objectiuUpdateSchema>;
+
+export const subObjectiuCreateSchema = z.object({
+  objectiuId: z.string().min(1),
+  titol: z.string().trim().min(1).max(200),
+});
+export type SubObjectiuCreateInput = z.infer<typeof subObjectiuCreateSchema>;
+
+export const subObjectiuToggleSchema = z.object({
+  id: z.string().min(1),
+  completat: z.boolean(),
+});
+export type SubObjectiuToggleInput = z.infer<typeof subObjectiuToggleSchema>;
