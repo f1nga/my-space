@@ -10,6 +10,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 type NavItem = {
   href: string;
@@ -75,9 +76,14 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="hidden border-t border-[var(--color-border)] p-4 text-xs text-[var(--color-text-subtle)] md:block">
-        <p className="font-medium text-[var(--color-text-muted)]">My Space</p>
-        <p>Productivitat personal</p>
+      <div className="border-t border-[var(--color-border)] p-3 md:p-4">
+        <div className="flex items-center justify-center md:justify-between">
+          <div className="hidden text-xs text-[var(--color-text-subtle)] md:block">
+            <p className="font-medium text-[var(--color-text-muted)]">My Space</p>
+            <p>Productivitat personal</p>
+          </div>
+          <ThemeToggle />
+        </div>
       </div>
     </aside>
   );
