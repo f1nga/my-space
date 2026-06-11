@@ -10,6 +10,8 @@ function daysFromToday(days: number, hour = 9, minute = 0): Date {
 }
 
 async function main() {
+  await prisma.subObjectiu.deleteMany();
+  await prisma.objectiu.deleteMany();
   await prisma.event.deleteMany();
   await prisma.note.deleteMany();
   await prisma.task.deleteMany();
@@ -88,6 +90,78 @@ async function main() {
       },
     ],
   });
+
+  const objectiuFisic = await prisma.objectiu.create({
+    data: {
+      titol: "Correr 5 km sense aturar-me",
+      descripcio: "Entrenament progressiu 3 dies per setmana",
+      dataInici: daysFromToday(-14, 8),
+      dataFinal: daysFromToday(30, 20),
+      categoria: "FISIC",
+      estat: "EN_PROGRES",
+      progress: 40,
+      subtasques: {
+        create: [
+          { titol: "Completar setmana 1 d'entrenament", completat: true },
+          { titol: "Arribar a 3 km continus", completat: true },
+          { titol: "Provar 4 km amb ritme estable", completat: false },
+          { titol: "Assolir 5 km", completat: false },
+        ],
+      },
+    },
+  });
+
+  await prisma.objectiu.create({
+    data: {
+      titol: "Llegir 12 llibres aquest any",
+      descripcio: "1 llibre al mes com a mínim",
+      dataInici: new Date(new Date().getFullYear(), 0, 1),
+      dataFinal: new Date(new Date().getFullYear(), 11, 31),
+      categoria: "MENTAL",
+      estat: "EN_PROGRES",
+      progress: 25,
+      subtasques: {
+        create: [
+          { titol: "Gener — Atomic Habits", completat: true },
+          { titol: "Febrer — Deep Work", completat: true },
+          { titol: "Març — El poder del ara", completat: true },
+          { titol: "Abril — Pensar ràpid, pensar a poc", completat: false },
+        ],
+      },
+    },
+  });
+
+  await prisma.objectiu.create({
+    data: {
+      titol: "Fons d'emergència de 3.000 €",
+      descripcio: "Reserva per imprevistos",
+      dataInici: daysFromToday(-60, 9),
+      dataFinal: daysFromToday(90, 9),
+      categoria: "DINERS",
+      estat: "EN_PROGRES",
+      progress: 65,
+    },
+  });
+
+  await prisma.objectiu.create({
+    data: {
+      titol: "Llançar el portfolio personal",
+      dataInici: daysFromToday(-30, 10),
+      dataFinal: daysFromToday(45, 18),
+      categoria: "TREBALL",
+      estat: "COMPLETAT",
+      progress: 100,
+      subtasques: {
+        create: [
+          { titol: "Dissenyar la home", completat: true },
+          { titol: "Implementar amb Next.js", completat: true },
+          { titol: "Publicar a Vercel", completat: true },
+        ],
+      },
+    },
+  });
+
+  void objectiuFisic;
 
   console.log("✔ Seed completat");
 }

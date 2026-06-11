@@ -47,3 +47,34 @@ model Event {
 
   @@index([startsAt])
 }
+
+model Objectiu {
+  id          String        @id @default(cuid())
+  titol       String
+  descripcio  String?
+  dataInici   DateTime
+  dataFinal   DateTime
+  // 'FISIC' | 'MENTAL' | 'DINERS' | 'TREBALL' | 'ALTRES' — validat amb Zod
+  categoria   String
+  // 'EN_PROGRES' | 'COMPLETAT' | 'ABANDONAT'
+  estat       String        @default("EN_PROGRES")
+  progress    Int           @default(0)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  subtasques  SubObjectiu[]
+
+  @@index([estat])
+  @@index([categoria])
+}
+
+model SubObjectiu {
+  id         String   @id @default(cuid())
+  titol      String
+  completat  Boolean  @default(false)
+  objectiuId String
+  objectiu   Objectiu @relation(fields: [objectiuId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([objectiuId])
+}
