@@ -14,7 +14,9 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    setTimeout(() => {
+      setMounted(true);
+    }, 0);
   }, []);
 
   const isDark = (resolvedTheme ?? theme) === "dark";
@@ -25,7 +27,7 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
         type="button"
         aria-label="Canviar tema"
         className={cn(
-          "grid h-9 w-9 place-items-center rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-muted)]",
+          "grid h-9 w-9 place-items-center rounded-lg border border-border bg-surface text-text-muted",
           className,
         )}
         disabled
@@ -39,7 +41,7 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
       aria-label={isDark ? "Canviar a mode clar" : "Canviar a mode fosc"}
       onClick={() => setTheme(isDark ? "light" : "dark")}
       className={cn(
-        "grid h-9 w-9 place-items-center rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-text)]",
+        "grid h-9 w-9 place-items-center rounded-lg border border-border bg-surface text-text-muted transition-colors hover:bg-surface-hover hover:text-text",
         className,
       )}
     >
