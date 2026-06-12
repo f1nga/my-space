@@ -25,13 +25,13 @@ export function MonthGrid({ date, items }: MonthGridProps) {
   return (
     <EventDialogsController>
       {({ openCreate, openDetail }) => (
-        <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)]/40 p-3">
+        <div className="rounded-2xl border border-border bg-bg-elevated/40 p-3">
          
           <div className="mb-2 grid grid-cols-7 gap-2 px-1" >
             {headers.map((label) => (
               <span
                 key={label}
-                className="text-[11px] font-medium uppercase tracking-wider text-[var(--color-text-subtle)]"
+                className="text-[11px] font-medium uppercase tracking-wider text-text-subtle"
               >
                 {label}
               </span>

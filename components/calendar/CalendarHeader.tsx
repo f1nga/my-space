@@ -43,32 +43,32 @@ export function CalendarHeader({ date, view }: CalendarHeaderProps) {
           <Link
             href={buildHref(previousDate(date, view), view)}
             aria-label="Anterior"
-            className="grid h-9 w-9 place-items-center rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-text)]"
+            className="grid h-9 w-9 place-items-center rounded-lg border border-border bg-surface text-text-muted transition-colors hover:bg-surface-hover hover:text-text"
           >
             <ChevronLeft className="h-4 w-4" aria-hidden />
           </Link>
           <Link
             href={buildHref(new Date(), view)}
-            className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-xs font-medium text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-text)]"
+            className="rounded-lg border border-border bg-surface px-3 py-2 text-xs font-medium text-text-muted transition-colors hover:bg-surface-hover hover:text-text"
           >
             Avui
           </Link>
           <Link
             href={buildHref(nextDate(date, view), view)}
             aria-label="Seguent"
-            className="grid h-9 w-9 place-items-center rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-text)]"
+            className="grid h-9 w-9 place-items-center rounded-lg border border-border bg-surface text-text-muted transition-colors hover:bg-surface-hover hover:text-text"
           >
             <ChevronRight className="h-4 w-4" aria-hidden />
           </Link>
         </div>
 
-        <h2 className="text-base font-semibold tracking-tight text-[var(--color-text)] sm:text-lg">
+        <h2 className="text-base font-semibold tracking-tight text-text sm:text-lg">
           {title}
         </h2>
 
         <div className="flex items-center gap-2">
           <div
-            className="inline-flex rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-0.5"
+            className="inline-flex rounded-lg border border-border bg-surface p-0.5"
             role="group"
             aria-label="Vista del calendari"
           >
@@ -82,8 +82,8 @@ export function CalendarHeader({ date, view }: CalendarHeaderProps) {
                   className={cn(
                     "rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
                     isActive
-                      ? "bg-[var(--color-bg-elevated)] text-[var(--color-text)] shadow-sm"
-                      : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]",
+                      ? "bg-bg-elevated text-text shadow-sm"
+                      : "text-text-muted hover:text-text",
                   )}
                 >
                   {label}

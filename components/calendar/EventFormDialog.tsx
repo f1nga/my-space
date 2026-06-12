@@ -95,7 +95,7 @@ function EventFormContent({
       <div className="space-y-1.5">
         <label
           htmlFor="event-title"
-          className="text-xs font-medium text-[var(--color-text-muted)]"
+          className="text-xs font-medium text-text-muted"
         >
           Titol
         </label>
@@ -107,14 +107,14 @@ function EventFormContent({
           autoFocus
           required
           maxLength={200}
-          className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-text)] focus:border-[var(--color-accent)] focus:outline-none"
+          className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text focus:border-accent focus:outline-none"
         />
       </div>
 
       <div className="space-y-1.5">
         <label
           htmlFor="event-description"
-          className="text-xs font-medium text-[var(--color-text-muted)]"
+          className="text-xs font-medium text-text-muted"
         >
           Descripcio
         </label>
@@ -125,16 +125,16 @@ function EventFormContent({
           rows={3}
           maxLength={5000}
           placeholder="Opcional"
-          className="w-full resize-y rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-text)] focus:border-[var(--color-accent)] focus:outline-none"
+          className="w-full resize-y rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text focus:border-accent focus:outline-none"
         />
       </div>
 
-      <label className="flex items-center gap-2 text-sm text-[var(--color-text-muted)]">
+      <label className="flex items-center gap-2 text-sm text-text-muted">
         <input
           type="checkbox"
           checked={allDay}
           onChange={(e) => setAllDay(e.target.checked)}
-          className="h-4 w-4 rounded border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-accent)] focus:ring-[var(--color-accent-ring)]"
+          className="h-4 w-4 rounded border-border bg-surface text-accent focus:ring-accent-ring"
         />
         Tot el dia
       </label>
@@ -143,7 +143,7 @@ function EventFormContent({
         <div className="space-y-1.5">
           <label
             htmlFor="event-start"
-            className="text-xs font-medium text-[var(--color-text-muted)]"
+            className="text-xs font-medium text-text-muted"
           >
             Inici
           </label>
@@ -153,13 +153,13 @@ function EventFormContent({
             value={startsAt}
             onChange={(e) => setStartsAt(e.target.value)}
             required
-            className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-text)] focus:border-[var(--color-accent)] focus:outline-none"
+            className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text focus:border-accent focus:outline-none"
           />
         </div>
         <div className="space-y-1.5">
           <label
             htmlFor="event-end"
-            className="text-xs font-medium text-[var(--color-text-muted)]"
+            className="text-xs font-medium text-text-muted"
           >
             Final (opcional)
           </label>
@@ -168,13 +168,13 @@ function EventFormContent({
             type={allDay ? "date" : "datetime-local"}
             value={endsAt}
             onChange={(e) => setEndsAt(e.target.value)}
-            className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-text)] focus:border-[var(--color-accent)] focus:outline-none"
+            className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text focus:border-accent focus:outline-none"
           />
         </div>
       </div>
 
       <fieldset className="space-y-2">
-        <legend className="text-xs font-medium text-[var(--color-text-muted)]">
+        <legend className="text-xs font-medium text-text-muted">
           Color
         </legend>
         <div className="flex flex-wrap gap-2">
@@ -189,7 +189,7 @@ function EventFormContent({
                 "h-7 w-7 rounded-full border transition-transform",
                 EVENT_COLOR_CLASSES[value],
                 color === value
-                  ? "border-white ring-2 ring-[var(--color-accent-ring)]"
+                  ? "border-white ring-2 ring-accent-ring"
                   : "border-transparent hover:scale-105",
               )}
             />
@@ -200,7 +200,7 @@ function EventFormContent({
       {error ? (
         <p
           role="alert"
-          className="rounded-md bg-[var(--color-danger-soft)] px-3 py-2 text-sm text-[var(--color-danger)]"
+          className="rounded-md bg-danger-soft px-3 py-2 text-sm text-danger"
         >
           {error}
         </p>

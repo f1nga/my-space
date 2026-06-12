@@ -106,7 +106,7 @@ export function ObjectiuFormDialog({
         <div className="space-y-1.5">
           <label
             htmlFor="objectiu-titol"
-            className="text-xs font-medium text-[var(--color-text-muted)]"
+            className="text-xs font-medium text-text-muted"
           >
             Títol
           </label>
@@ -118,7 +118,7 @@ export function ObjectiuFormDialog({
             autoFocus
             required
             maxLength={200}
-            className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-subtle)] focus:border-[var(--color-accent)] focus:outline-none"
+            className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text placeholder:text-text-subtle focus:border-accent focus:outline-none"
             placeholder="Per exemple, estalviar 3.000 €"
           />
         </div>
@@ -126,7 +126,7 @@ export function ObjectiuFormDialog({
         <div className="space-y-1.5">
           <label
             htmlFor="objectiu-descripcio"
-            className="text-xs font-medium text-[var(--color-text-muted)]"
+            className="text-xs font-medium text-text-muted"
           >
             Descripció
           </label>
@@ -136,7 +136,7 @@ export function ObjectiuFormDialog({
             onChange={(e) => setDescripcio(e.target.value)}
             rows={3}
             maxLength={2000}
-            className="w-full resize-none rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-subtle)] focus:border-[var(--color-accent)] focus:outline-none"
+            className="w-full resize-none rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text placeholder:text-text-subtle focus:border-accent focus:outline-none"
             placeholder="Detalls opcionals sobre la fita..."
           />
         </div>
@@ -145,9 +145,9 @@ export function ObjectiuFormDialog({
           <div className="space-y-1.5">
             <label
               htmlFor="objectiu-inici"
-              className="text-xs font-medium text-[var(--color-text-muted)]"
+              className="text-xs font-medium text-text-muted"
             >
-              Data d'inici
+              Data d&apos;inici
             </label>
             <input
               id="objectiu-inici"
@@ -155,13 +155,13 @@ export function ObjectiuFormDialog({
               value={dataInici}
               onChange={(e) => setDataInici(e.target.value)}
               required
-              className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-text)] focus:border-[var(--color-accent)] focus:outline-none"
+              className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text focus:border-accent focus:outline-none"
             />
           </div>
           <div className="space-y-1.5">
             <label
               htmlFor="objectiu-final"
-              className="text-xs font-medium text-[var(--color-text-muted)]"
+              className="text-xs font-medium text-text-muted"
             >
               Data final
             </label>
@@ -171,7 +171,7 @@ export function ObjectiuFormDialog({
               value={dataFinal}
               onChange={(e) => setDataFinal(e.target.value)}
               required
-              className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-text)] focus:border-[var(--color-accent)] focus:outline-none"
+              className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text focus:border-accent focus:outline-none"
             />
           </div>
         </div>
@@ -180,7 +180,7 @@ export function ObjectiuFormDialog({
           <div className="space-y-1.5">
             <label
               htmlFor="objectiu-categoria"
-              className="text-xs font-medium text-[var(--color-text-muted)]"
+              className="text-xs font-medium text-text-muted"
             >
               Categoria
             </label>
@@ -190,7 +190,7 @@ export function ObjectiuFormDialog({
               onChange={(e) =>
                 setCategoria(e.target.value as CategoriaObjectiu)
               }
-              className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-text)] focus:border-[var(--color-accent)] focus:outline-none"
+              className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text focus:border-accent focus:outline-none"
             >
               {CATEGORIES_OBJECTIU.map((cat) => (
                 <option key={cat} value={cat}>
@@ -204,7 +204,7 @@ export function ObjectiuFormDialog({
             <div className="space-y-1.5">
               <label
                 htmlFor="objectiu-progress"
-                className="text-xs font-medium text-[var(--color-text-muted)]"
+                className="text-xs font-medium text-text-muted"
               >
                 Progrés ({progress}%)
               </label>
@@ -215,7 +215,7 @@ export function ObjectiuFormDialog({
                 max={100}
                 value={progress}
                 onChange={(e) => setProgress(Number(e.target.value))}
-                className="w-full accent-[var(--color-accent)]"
+                className="w-full accent-accent"
               />
             </div>
           ) : null}
@@ -224,13 +224,13 @@ export function ObjectiuFormDialog({
         {!editing ? (
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <p className="text-xs font-medium text-[var(--color-text-muted)]">
+              <p className="text-xs font-medium text-text-muted">
                 Subtasques (opcional)
               </p>
               <button
                 type="button"
                 onClick={() => setSubtasques((prev) => [...prev, ""])}
-                className="inline-flex items-center gap-1 text-xs font-medium text-[var(--color-accent)] hover:underline"
+                className="inline-flex items-center gap-1 text-xs font-medium text-accent hover:underline"
               >
                 <Plus className="h-3.5 w-3.5" aria-hidden />
                 Afegir
@@ -251,7 +251,7 @@ export function ObjectiuFormDialog({
                     }
                     maxLength={200}
                     placeholder={`Subtasca ${index + 1}`}
-                    className="flex-1 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-subtle)] focus:border-[var(--color-accent)] focus:outline-none"
+                    className="flex-1 rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text placeholder:text-text-subtle focus:border-accent focus:outline-none"
                   />
                   {subtasques.length > 1 ? (
                     <button
@@ -262,7 +262,7 @@ export function ObjectiuFormDialog({
                           prev.filter((_, i) => i !== index),
                         )
                       }
-                      className="rounded-lg border border-[var(--color-border)] px-2 text-[var(--color-text-muted)] hover:bg-[var(--color-surface)] hover:text-[var(--color-danger)]"
+                      className="rounded-lg border border-border px-2 text-text-muted hover:bg-surface hover:text-danger"
                     >
                       <Trash2 className="h-4 w-4" aria-hidden />
                     </button>
@@ -274,7 +274,7 @@ export function ObjectiuFormDialog({
         ) : null}
 
         {error ? (
-          <p className="rounded-md bg-[var(--color-danger-soft)] px-3 py-2 text-sm text-[var(--color-danger)]">
+          <p className="rounded-md bg-danger-soft px-3 py-2 text-sm text-danger">
             {error}
           </p>
         ) : null}

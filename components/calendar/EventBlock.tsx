@@ -31,7 +31,7 @@ export function EventBlock({ item, day, onClick }: EventBlockProps) {
         onClick(item);
       }}
       className={cn(
-        "absolute left-0.5 right-0.5 overflow-hidden rounded-md px-1.5 py-0.5 text-left text-[11px] font-medium text-[var(--color-accent-foreground)] shadow-sm transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--color-accent)]",
+        "absolute left-0.5 right-0.5 overflow-hidden rounded-md px-1.5 py-0.5 text-left text-[11px] font-medium text-accent-foreground shadow-sm transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent",
         colorClass(item.color),
       )}
       style={{ top: topPx, height: heightPx, minHeight: 24 }}

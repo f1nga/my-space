@@ -51,7 +51,7 @@ function DayTimelineContent({
         />
       ) : null}
       {!embedded && items.length > 0 ? (
-        <p className="mb-3 text-xs text-[var(--color-text-subtle)]">
+        <p className="mb-3 text-xs text-text-subtle">
           {eventCount} esdeveniment{eventCount === 1 ? "" : "s"}
           {taskCount > 0
             ? ` · ${taskCount} tasca${taskCount === 1 ? "" : "es"}`
@@ -60,8 +60,8 @@ function DayTimelineContent({
       ) : null}
 
       {allDay.length > 0 ? (
-        <div className="mb-2 flex flex-wrap gap-1 border-b border-[var(--color-border)]/60 pb-2">
-          <span className="w-full text-[10px] font-medium uppercase tracking-wider text-[var(--color-text-subtle)]">
+        <div className="mb-2 flex flex-wrap gap-1 border-b border-border/60 pb-2">
+          <span className="w-full text-[10px] font-medium uppercase tracking-wider text-text-subtle">
             Tot el dia
           </span>
           {allDay.map((item) => (

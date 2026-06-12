@@ -56,7 +56,7 @@ export function DayItemsPopover({
                   onEventClick(item);
                 }}
                 className={cn(
-                  "flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm transition-colors hover:bg-[var(--color-surface)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)]",
+                  "flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm transition-colors hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
                 )}
                 aria-label={`Esdeveniment: ${item.title}`}
               >
@@ -75,7 +75,7 @@ export function DayItemsPopover({
             ) : (
               <Link
                 href="/board"
-                className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-surface)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)]"
+                className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm text-text-muted transition-colors hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
                 aria-label={`Tasca: ${item.title}`}
               >
                 <span className="min-w-0 flex-1 truncate">{item.title}</span>
@@ -84,10 +84,10 @@ export function DayItemsPopover({
           </li>
         ))}
       </ul>
-      <div className="mt-4 border-t border-[var(--color-border)] pt-3">
+          <div className="mt-4 border-t border-border pt-3">
         <Link
           href={`/calendar?view=day&date=${toISODate(day)}`}
-          className="text-xs font-medium text-[var(--color-accent)] hover:underline"
+          className="text-xs font-medium text-accent hover:underline"
         >
           Veure dia complet
         </Link>

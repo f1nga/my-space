@@ -107,22 +107,22 @@ export function EventDetailDialog({
             )}
             aria-hidden
           />
-          <p className="text-sm text-[var(--color-text-muted)]">
+          <p className="text-sm text-text-muted">
             {formatEventRange(event)}
           </p>
         </div>
 
         {event.description ? (
           <div className="space-y-1">
-            <p className="text-xs font-medium text-[var(--color-text-subtle)]">
+            <p className="text-xs font-medium text-text-subtle">
               Descripcio
             </p>
-            <p className="whitespace-pre-wrap text-sm text-[var(--color-text)]">
+            <p className="whitespace-pre-wrap text-sm text-text">
               {event.description}
             </p>
           </div>
         ) : (
-          <p className="text-sm italic text-[var(--color-text-subtle)]">
+          <p className="text-sm italic text-text-subtle">
             Sense descripcio
           </p>
         )}
@@ -130,14 +130,14 @@ export function EventDetailDialog({
         {error ? (
           <p
             role="alert"
-            className="rounded-md bg-[var(--color-danger-soft)] px-3 py-2 text-sm text-[var(--color-danger)]"
+            className="rounded-md bg-danger-soft px-3 py-2 text-sm text-danger"
           >
             {error}
           </p>
         ) : null}
 
         {confirmDelete ? (
-          <p className="text-sm text-[var(--color-text-muted)]">
+          <p className="text-sm text-text-muted">
             Confirma eliminacio? Aquesta accio no es pot desfer.
           </p>
         ) : null}

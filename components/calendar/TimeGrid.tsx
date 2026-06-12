@@ -18,7 +18,7 @@ const hourRows = (
     {HOUR_LABELS.map((_, hour) => (
       <div
         key={hour}
-        className="border-t border-[var(--color-border)]/40"
+        className="border-t border-border/40"
         style={{ height: HOUR_HEIGHT_PX }}
       />
     ))}
@@ -81,7 +81,7 @@ export function TimeGridColumn({
 
   return (
     <div
-      className="relative cursor-pointer border-l border-[var(--color-border)]/40 first:border-l-0"
+      className="relative cursor-pointer border-l border-border/40 first:border-l-0"
       style={{ height: gridHeight }}
       onClick={handleColumnClick}
       role="presentation"
@@ -110,7 +110,7 @@ export function TimeGridHourLabels() {
       {HOUR_LABELS.map((label, hour) => (
         <div
           key={hour}
-          className="pr-2 text-right text-[10px] text-[var(--color-text-subtle)]"
+          className="pr-2 text-right text-[10px] text-text-subtle"
           style={{ height: HOUR_HEIGHT_PX, lineHeight: `${HOUR_HEIGHT_PX}px` }}
         >
           {hour > 0 ? `${label}:00` : ""}
@@ -136,7 +136,7 @@ export function AllDayLane({
   return (
     <div
       className={cn(
-        "grid gap-1 border-b border-[var(--color-border)]/60 py-2",
+        "grid gap-1 border-b border-border/60 py-2",
         columns === 7 ? "grid-cols-7" : "grid-cols-1",
       )}
     >
@@ -148,14 +148,14 @@ export function AllDayLane({
                 key={item.id}
                 type="button"
                 onClick={() => onEventClick(item)}
-                className="truncate rounded-md bg-[var(--color-accent)] px-2 py-0.5 text-[11px] font-medium text-[var(--color-accent-foreground)] hover:opacity-90"
+                className="truncate rounded-md bg-accent px-2 py-0.5 text-[11px] font-medium text-accent-foreground hover:opacity-90"
               >
                 {item.title}
               </button>
             ) : (
               <span
                 key={item.id}
-                className="truncate rounded-md bg-[var(--color-surface)] px-2 py-0.5 text-[11px] font-medium text-[var(--color-text)]"
+                className="truncate rounded-md bg-surface px-2 py-0.5 text-[11px] font-medium text-text"
               >
                 {item.title}
               </span>

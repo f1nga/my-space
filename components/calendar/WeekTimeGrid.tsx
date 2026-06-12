@@ -43,7 +43,7 @@ function WeekDesktopGrid({
   );
 
   return (
-    <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)]/40 p-3">
+    <div className="rounded-2xl border border-border bg-bg-elevated/40 p-3">
       {!hasAnyItems ? (
         <EmptyState
           icon={Calendar}
@@ -59,15 +59,15 @@ function WeekDesktopGrid({
           <Link
             key={dayKey(day)}
             href={`/calendar?view=day&date=${toISODate(day)}`}
-            className="px-1 py-2 text-center text-[11px] font-medium uppercase tracking-wider text-[var(--color-text-subtle)] transition-colors hover:text-[var(--color-text)]"
+            className="px-1 py-2 text-center text-[11px] font-medium uppercase tracking-wider text-text-subtle transition-colors hover:text-text"
           >
             {format(day, "EEE d", { locale: ca })}
           </Link>
         ))}
       </div>
 
-      <div className="mb-2 grid grid-cols-[56px_repeat(7,1fr)] gap-0 border-b border-[var(--color-border)]/60 pb-2">
-        <span className="pr-2 text-right text-[10px] text-[var(--color-text-subtle)]">
+        <div className="mb-2 grid grid-cols-[56px_repeat(7,1fr)] gap-0 border-b border-border/60 pb-2">
+        <span className="pr-2 text-right text-[10px] text-text-subtle">
           Tot el dia
         </span>
         {days.map((day) => {
@@ -76,7 +76,7 @@ function WeekDesktopGrid({
           return (
             <div
               key={dayKey(day)}
-              className="flex min-h-[28px] flex-wrap gap-0.5 border-l border-[var(--color-border)]/40 px-0.5 first:border-l-0"
+              className="flex min-h-[28px] flex-wrap gap-0.5 border-l border-border/40 px-0.5 first:border-l-0"
             >
               {allDay.map((item) => (
                 <CalendarItemChip
@@ -134,7 +134,7 @@ export function WeekTimeGrid({ date, items }: WeekTimeGridProps) {
           <div className={cn("space-y-4 md:hidden")}>
             {days.map((day) => (
               <div key={dayKey(day)}>
-                <p className="mb-2 text-sm font-medium text-[var(--color-text)]">
+                <p className="mb-2 text-sm font-medium text-text">
                   {format(day, "EEEE d MMM", { locale: ca })}
                 </p>
                 <DayTimeline
