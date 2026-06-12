@@ -54,7 +54,7 @@ export function ObjectiusStats({ stats }: ObjectiusStatsProps) {
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-      <Card className="overflow-hidden">
+      <Card className="cursor-default overflow-hidden">
         <div className="relative p-5">
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-[var(--color-accent)]/10 to-transparent" />
           <div className="relative flex items-center gap-4">
@@ -76,7 +76,7 @@ export function ObjectiusStats({ stats }: ObjectiusStatsProps) {
         </div>
       </Card>
 
-      <Card>
+      <Card className="cursor-default">
         <div className="flex items-center gap-4 p-5">
           <ProgressRing value={stats.taxaCompletacio} />
           <div>
@@ -90,7 +90,7 @@ export function ObjectiusStats({ stats }: ObjectiusStatsProps) {
         </div>
       </Card>
 
-      <Card className="overflow-hidden">
+      <Card className="cursor-default overflow-hidden">
         <div className="relative p-5">
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-amber-500/10 to-transparent" />
           <div className="relative flex items-center gap-4">

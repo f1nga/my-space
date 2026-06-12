@@ -7,7 +7,6 @@ import {
   Trash2,
 } from "lucide-react";
 import { useState, useTransition } from "react";
-import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { deleteObjectiu } from "@/lib/actions/objectius";
 import {
@@ -39,10 +38,26 @@ export function ObjectiuCard({ objectiu, onEdit, onOpen }: ObjectiuCardProps) {
   const subtasquesDone = objectiu.subtasques.filter((s) => s.completat).length;
   const isCompleted = objectiu.estat === "COMPLETAT";
 
+  function handleCardActivate() {
+    onOpen(objectiu);
+  }
+
+  function handleCardKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      handleCardActivate();
+    }
+  }
+
   return (
     <Card
+      role="button"
+      tabIndex={0}
+      onClick={handleCardActivate}
+      onKeyDown={handleCardKeyDown}
+      aria-label={`Obrir detall: ${objectiu.titol}`}
       className={cn(
-        "group relative overflow-hidden transition-all hover:border-[var(--color-border-strong)] hover:shadow-[var(--shadow-card)]",
+        "group relative cursor-pointer overflow-hidden transition-all hover:border-[var(--color-border-strong)] hover:shadow-[var(--shadow-card)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)]",
         isCompleted && "opacity-90",
       )}
     >
@@ -64,15 +79,9 @@ export function ObjectiuCard({ objectiu, onEdit, onOpen }: ObjectiuCardProps) {
             >
               {CATEGORIA_OBJECTIU_LABELS[objectiu.categoria]}
             </span>
-            <button
-              type="button"
-              onClick={() => onOpen(objectiu)}
-              className="block text-left"
-            >
-              <h3 className="text-base font-semibold tracking-tight text-[var(--color-text)] transition-colors group-hover:text-[var(--color-accent)]">
-                {objectiu.titol}
-              </h3>
-            </button>
+            <h3 className="text-base font-semibold tracking-tight text-[var(--color-text)] transition-colors group-hover:text-[var(--color-accent)]">
+              {objectiu.titol}
+            </h3>
             {objectiu.descripcio ? (
               <p className="line-clamp-2 text-sm text-[var(--color-text-muted)]">
                 {objectiu.descripcio}
@@ -84,16 +93,23 @@ export function ObjectiuCard({ objectiu, onEdit, onOpen }: ObjectiuCardProps) {
             <button
               type="button"
               aria-label="Opcions de l'objectiu"
-              onClick={() => setMenuOpen((v) => !v)}
-              className="rounded-lg p-1.5 text-[var(--color-text-muted)] opacity-0 transition-opacity hover:bg-[var(--color-surface)] group-hover:opacity-100 focus-visible:opacity-100"
+              aria-expanded={menuOpen}
+              onClick={(event) => {
+                event.stopPropagation();
+                setMenuOpen((v) => !v);
+              }}
+              className="cursor-pointer rounded-lg p-1.5 text-[var(--color-text-muted)] opacity-0 transition-opacity hover:bg-[var(--color-surface)] group-hover:opacity-100 focus-visible:opacity-100"
             >
               <MoreHorizontal className="h-4 w-4" aria-hidden />
             </button>
             {menuOpen ? (
-              <div className="absolute right-0 z-10 mt-1 w-36 overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)] py-1 shadow-[var(--shadow-pop)]">
+              <div
+                className="absolute right-0 z-10 mt-1 w-36 overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)] py-1 shadow-[var(--shadow-pop)]"
+                onClick={(event) => event.stopPropagation()}
+              >
                 <button
                   type="button"
-                  className="flex w-full items-center gap-2 px-3 py-2 text-sm text-[var(--color-text-muted)] hover:bg-[var(--color-surface)] hover:text-[var(--color-text)]"
+                  className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-sm text-[var(--color-text-muted)] hover:bg-[var(--color-surface)] hover:text-[var(--color-text)]"
                   onClick={() => {
                     setMenuOpen(false);
                     onEdit(objectiu);
@@ -105,7 +121,7 @@ export function ObjectiuCard({ objectiu, onEdit, onOpen }: ObjectiuCardProps) {
                 <button
                   type="button"
                   disabled={pendingDelete}
-                  className="flex w-full items-center gap-2 px-3 py-2 text-sm text-[var(--color-danger)] hover:bg-[var(--color-danger-soft)] disabled:opacity-50"
+                  className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-sm text-[var(--color-danger)] hover:bg-[var(--color-danger-soft)] disabled:cursor-not-allowed disabled:opacity-50"
                   onClick={() => {
                     if (!confirm("Vols eliminar aquest objectiu?")) return;
                     startDelete(async () => {
@@ -171,22 +187,14 @@ export function ObjectiuCard({ objectiu, onEdit, onOpen }: ObjectiuCardProps) {
           </p>
         ) : null}
 
-        <div className="flex gap-2 pt-1">
-          <Button
-            variant="secondary"
-            size="sm"
-            className="flex-1"
-            onClick={() => onOpen(objectiu)}
-          >
-            Veure detall
-          </Button>
-          {isCompleted ? (
+        {isCompleted ? (
+          <div className="flex gap-2 pt-1">
             <span className="inline-flex items-center gap-1 rounded-lg bg-[var(--color-accent-soft)] px-3 py-1.5 text-xs font-medium text-[var(--color-accent)]">
               <CheckCircle2 className="h-3.5 w-3.5" aria-hidden />
               Fet!
             </span>
-          ) : null}
-        </div>
+          </div>
+        ) : null}
 
         <p className="text-[10px] text-[var(--color-text-subtle)]">
           {formatDateCa(new Date(objectiu.dataInici), {

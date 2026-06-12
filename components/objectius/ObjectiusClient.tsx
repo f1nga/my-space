@@ -81,8 +81,8 @@ export function ObjectiusClient({ initial, stats }: ObjectiusClientProps) {
               onClick={() => setFilterEstat(estat)}
               className={
                 filterEstat === estat
-                  ? "rounded-full bg-[var(--color-accent-soft)] px-3 py-1 text-xs font-medium text-[var(--color-accent)]"
-                  : "rounded-full border border-[var(--color-border)] px-3 py-1 text-xs font-medium text-[var(--color-text-muted)] hover:bg-[var(--color-surface)]"
+                  ? "rounded-full cursor-pointer bg-accent-soft px-3 py-1 text-xs font-medium text-accent"
+                  : "rounded-full cursor-pointer border border-border px-3 py-1 text-xs font-medium text-text-muted hover:bg-surface"
               }
             >
               {estat === "TOTS"
@@ -91,7 +91,7 @@ export function ObjectiusClient({ initial, stats }: ObjectiusClientProps) {
             </button>
           ))}
         </div>
-        <Button size="sm" onClick={openCreate}>
+        <Button size="sm" onClick={openCreate} className="cursor-pointer">
           <Plus className="h-4 w-4" aria-hidden />
           Afegir objectiu
         </Button>
@@ -103,8 +103,8 @@ export function ObjectiusClient({ initial, stats }: ObjectiusClientProps) {
           onClick={() => setFilterCategoria("TOTES")}
           className={
             filterCategoria === "TOTES"
-              ? "rounded-lg bg-[var(--color-surface)] px-2.5 py-1 text-xs font-medium text-[var(--color-text)]"
-              : "rounded-lg px-2.5 py-1 text-xs text-[var(--color-text-muted)] hover:bg-[var(--color-surface)]"
+              ? "rounded-lg cursor-pointer bg-surface px-2.5 py-1 text-xs font-medium text-text"
+              : "rounded-lg cursor-pointer px-2.5 py-1 text-xs text-text-muted hover:bg-surface"
           }
         >
           Totes
@@ -117,8 +117,8 @@ export function ObjectiusClient({ initial, stats }: ObjectiusClientProps) {
               onClick={() => setFilterCategoria(cat)}
               className={
                 filterCategoria === cat
-                  ? "rounded-lg bg-[var(--color-surface)] px-2.5 py-1 text-xs font-medium text-[var(--color-text)]"
-                  : "rounded-lg px-2.5 py-1 text-xs text-[var(--color-text-muted)] hover:bg-[var(--color-surface)]"
+                  ? "rounded-lg cursor-pointer bg-surface px-2.5 py-1 text-xs font-medium text-text"
+                  : "rounded-lg cursor-pointer px-2.5 py-1 text-xs text-text-muted hover:bg-surface"
               }
             >
               {CATEGORIA_OBJECTIU_LABELS[cat]}
