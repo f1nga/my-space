@@ -1,13 +1,25 @@
 "use client";
 
-import { CheckCircle2, Circle, PartyPopper } from "lucide-react";
-import { useState, useTransition } from "react";
+import {
+  Check,
+  CheckCircle2,
+  Circle,
+  PartyPopper,
+  Pencil,
+  Plus,
+  Trash2,
+  X,
+} from "lucide-react";
+import { useEffect, useState, useTransition } from "react";
 import { Button } from "@/components/ui/Button";
 import { Dialog } from "@/components/ui/Dialog";
 import {
   completeObjectiu,
+  createSubObjectiu,
+  deleteSubObjectiu,
   toggleSubObjectiu,
   updateObjectiuProgress,
+  updateSubObjectiu,
 } from "@/lib/actions/objectius";
 import { CATEGORIA_STYLES, timeLabel } from "@/lib/objectius";
 import {
@@ -31,6 +43,19 @@ export function ObjectiuDetailDialog({
   const [pending, startTransition] = useTransition();
   const [localProgress, setLocalProgress] = useState(0);
   const [showCelebration, setShowCelebration] = useState(false);
+  const [newSubtasca, setNewSubtasca] = useState("");
+  const [subError, setSubError] = useState<string | null>(null);
+  const [editingSubId, setEditingSubId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+
+  useEffect(() => {
+    if (!open) {
+      setNewSubtasca("");
+      setSubError(null);
+      setEditingSubId(null);
+      setEditTitle("");
+    }
+  }, [open]);
 
   if (!objectiu) return null;
 
@@ -52,6 +77,74 @@ export function ObjectiuDetailDialog({
   function handleToggleSub(id: string, completat: boolean) {
     startTransition(async () => {
       await toggleSubObjectiu({ id, completat: !completat });
+    });
+  }
+
+  function handleDeleteSub(id: string, titol: string) {
+    if (!confirm(`Vols eliminar la subtasca «${titol}»?`)) return;
+    setSubError(null);
+    if (editingSubId === id) {
+      setEditingSubId(null);
+      setEditTitle("");
+    }
+    startTransition(async () => {
+      const result = await deleteSubObjectiu({ id });
+      if (!result.ok) setSubError(result.error);
+    });
+  }
+
+  function startEditSub(id: string, titol: string) {
+    setEditingSubId(id);
+    setEditTitle(titol);
+    setSubError(null);
+  }
+
+  function cancelEditSub() {
+    setEditingSubId(null);
+    setEditTitle("");
+  }
+
+  function handleSaveEditSub(id: string) {
+    const titol = editTitle.trim();
+    if (!titol) {
+      setSubError("Cal un títol per a la subtasca.");
+      return;
+    }
+    setSubError(null);
+    startTransition(async () => {
+      const result = await updateSubObjectiu({ id, titol });
+      if (!result.ok) {
+        setSubError(result.error);
+        return;
+      }
+      cancelEditSub();
+    });
+  }
+
+  function handleAddSubtasca(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setSubError(null);
+
+    const titol = newSubtasca.trim();
+    if (!titol) {
+      setSubError("Escriu un títol per a la subtasca.");
+      return;
+    }
+    if (objectiu.subtasques.length >= 20) {
+      setSubError("Màxim 20 subtasques per objectiu.");
+      return;
+    }
+
+    startTransition(async () => {
+      const result = await createSubObjectiu({
+        objectiuId: objectiu.id,
+        titol,
+      });
+      if (!result.ok) {
+        setSubError(result.error);
+        return;
+      }
+      setNewSubtasca("");
     });
   }
 
@@ -126,60 +219,171 @@ export function ObjectiuDetailDialog({
           })}
         </p>
 
-        {hasSubtasques ? (
-          <div className="space-y-2">
-            <p className="text-xs font-medium uppercase tracking-wider text-[var(--color-text-subtle)]">
-              Subtasques
-            </p>
+        <div className="space-y-3">
+          <p className="text-xs font-medium uppercase tracking-wider text-text-subtle">
+            Subtasques
+          </p>
+
+          {hasSubtasques ? (
             <ul className="space-y-2">
-              {objectiu.subtasques.map((sub) => (
-                <li key={sub.id}>
-                  <button
-                    type="button"
-                    disabled={pending || isCompleted}
-                    onClick={() => handleToggleSub(sub.id, sub.completat)}
-                    className={cn(
-                      "flex w-full items-center gap-3 rounded-xl border border-[var(--color-border)] px-3 py-2.5 text-left text-sm transition-colors",
-                      sub.completat
-                        ? "bg-[var(--color-accent-soft)] text-[var(--color-accent)]"
-                        : "bg-[var(--color-surface)] text-[var(--color-text)] hover:border-[var(--color-border-strong)]",
-                    )}
-                  >
-                    {sub.completat ? (
-                      <CheckCircle2 className="h-4 w-4 shrink-0" aria-hidden />
-                    ) : (
-                      <Circle className="h-4 w-4 shrink-0 text-[var(--color-text-muted)]" aria-hidden />
-                    )}
-                    <span
-                      className={cn(sub.completat && "line-through opacity-80")}
+              {objectiu.subtasques.map((sub) =>
+                editingSubId === sub.id ? (
+                  <li key={sub.id} className="flex gap-2">
+                    <input
+                      type="text"
+                      value={editTitle}
+                      onChange={(e) => setEditTitle(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleSaveEditSub(sub.id);
+                        }
+                        if (e.key === "Escape") cancelEditSub();
+                      }}
+                      disabled={pending}
+                      maxLength={200}
+                      autoFocus
+                      aria-label="Editar títol de la subtasca"
+                      className="min-w-0 flex-1 rounded-xl border border-accent bg-surface px-3 py-2 text-sm text-text focus:outline-none"
+                    />
+                    <button
+                      type="button"
+                      disabled={pending}
+                      onClick={() => handleSaveEditSub(sub.id)}
+                      aria-label="Desar subtasca"
+                      className="grid h-10 w-10 shrink-0 cursor-pointer place-items-center rounded-xl border border-border text-accent transition-colors hover:bg-accent-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
                     >
-                      {sub.titol}
-                    </span>
-                  </button>
-                </li>
-              ))}
+                      <Check className="h-4 w-4" aria-hidden />
+                    </button>
+                    <button
+                      type="button"
+                      disabled={pending}
+                      onClick={cancelEditSub}
+                      aria-label="Cancel·lar edició"
+                      className="grid h-10 w-10 shrink-0 cursor-pointer place-items-center rounded-xl border border-border text-text-muted transition-colors hover:bg-surface hover:text-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                    >
+                      <X className="h-4 w-4" aria-hidden />
+                    </button>
+                  </li>
+                ) : (
+                  <li key={sub.id} className="flex gap-2">
+                    <button
+                      type="button"
+                      disabled={pending}
+                      aria-pressed={sub.completat}
+                      onClick={() => handleToggleSub(sub.id, sub.completat)}
+                      className={cn(
+                        "flex min-w-0 flex-1 cursor-pointer items-center gap-3 rounded-xl border border-border px-3 py-2.5 text-left text-sm transition-colors",
+                        sub.completat
+                          ? "bg-accent-soft text-accent"
+                          : "bg-surface text-text hover:border-border-strong",
+                      )}
+                    >
+                      {sub.completat ? (
+                        <CheckCircle2
+                          className="h-4 w-4 shrink-0"
+                          aria-hidden
+                        />
+                      ) : (
+                        <Circle
+                          className="h-4 w-4 shrink-0 text-text-muted"
+                          aria-hidden
+                        />
+                      )}
+                      <span
+                        className={cn(
+                          "truncate",
+                          sub.completat && "line-through opacity-80",
+                        )}
+                      >
+                        {sub.titol}
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      disabled={pending}
+                      onClick={() => startEditSub(sub.id, sub.titol)}
+                      aria-label={`Editar subtasca: ${sub.titol}`}
+                      className="grid h-10 w-10 shrink-0 cursor-pointer place-items-center rounded-xl border border-border text-text-muted transition-colors hover:bg-surface hover:text-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                    >
+                      <Pencil className="h-4 w-4" aria-hidden />
+                    </button>
+                    <button
+                      type="button"
+                      disabled={pending}
+                      onClick={() => handleDeleteSub(sub.id, sub.titol)}
+                      aria-label={`Eliminar subtasca: ${sub.titol}`}
+                      className="grid h-10 w-10 shrink-0 cursor-pointer place-items-center rounded-xl border border-border text-text-muted transition-colors hover:border-danger/40 hover:bg-danger-soft hover:text-danger focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                    >
+                      <Trash2 className="h-4 w-4" aria-hidden />
+                    </button>
+                  </li>
+                ),
+              )}
             </ul>
-          </div>
-        ) : (
-          <div className="space-y-2">
-            <label
-              htmlFor="detail-progress"
-              className="text-xs font-medium text-[var(--color-text-muted)]"
-            >
-              Actualitza el progrés manualment
-            </label>
-            <input
-              id="detail-progress"
-              type="range"
-              min={0}
-              max={100}
-              defaultValue={objectiu.progress}
-              disabled={pending || isCompleted}
-              onChange={(e) => handleProgressChange(Number(e.target.value))}
-              className="w-full accent-[var(--color-accent)]"
-            />
-          </div>
-        )}
+          ) : (
+            <div className="space-y-2 rounded-xl border border-dashed border-border bg-surface/50 px-3 py-3">
+              <p className="text-xs text-text-muted">
+                {isCompleted
+                  ? "Encara no hi ha subtasques. Si n'afegeixes, l'objectiu tornarà a estar en progrés."
+                  : "Encara no hi ha subtasques. Afegeix-ne per calcular el progrés automàticament, o fes servir el control manual."}
+              </p>
+              {!isCompleted ? (
+                <>
+                  <label
+                    htmlFor="detail-progress"
+                    className="text-xs font-medium text-text-muted"
+                  >
+                    Progrés manual ({progress}%)
+                  </label>
+                  <input
+                    id="detail-progress"
+                    type="range"
+                    min={0}
+                    max={100}
+                    defaultValue={objectiu.progress}
+                    disabled={pending}
+                    onChange={(e) =>
+                      handleProgressChange(Number(e.target.value))
+                    }
+                    className="w-full accent-accent"
+                  />
+                </>
+              ) : null}
+            </div>
+          )}
+
+          {isCompleted && hasSubtasques ? (
+            <p className="text-xs text-text-muted">
+              Pots afegir més subtasques; l&apos;objectiu deixarà d&apos;estar
+              assolit fins que les completis totes.
+            </p>
+          ) : null}
+
+          {objectiu.subtasques.length < 20 ? (
+            <form onSubmit={handleAddSubtasca} className="flex gap-2">
+              <input
+                type="text"
+                value={newSubtasca}
+                onChange={(e) => setNewSubtasca(e.target.value)}
+                maxLength={200}
+                disabled={pending}
+                placeholder="Nova subtasca..."
+                className="min-w-0 flex-1 rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text placeholder:text-text-subtle focus:border-accent focus:outline-none"
+              />
+              <Button type="submit" size="sm" disabled={pending}>
+                <Plus className="h-4 w-4" aria-hidden />
+                Afegir
+              </Button>
+            </form>
+          ) : null}
+
+          {subError ? (
+            <p className="text-sm text-danger" role="alert">
+              {subError}
+            </p>
+          ) : null}
+        </div>
 
         {!isCompleted ? (
           <Button

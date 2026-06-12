@@ -182,3 +182,14 @@ export const subObjectiuToggleSchema = z.object({
   completat: z.boolean(),
 });
 export type SubObjectiuToggleInput = z.infer<typeof subObjectiuToggleSchema>;
+
+export const subObjectiuDeleteSchema = z.object({
+  id: z.string().min(1),
+});
+export type SubObjectiuDeleteInput = z.infer<typeof subObjectiuDeleteSchema>;
+
+export const subObjectiuUpdateSchema = z.object({
+  id: z.string().min(1),
+  titol: z.string().trim().min(1).max(200),
+});
+export type SubObjectiuUpdateInput = z.infer<typeof subObjectiuUpdateSchema>;

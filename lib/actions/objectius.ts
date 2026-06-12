@@ -7,7 +7,9 @@ import {
   objectiuCreateSchema,
   objectiuUpdateSchema,
   subObjectiuCreateSchema,
+  subObjectiuDeleteSchema,
   subObjectiuToggleSchema,
+  subObjectiuUpdateSchema,
 } from "@/lib/types";
 
 type ActionResult<T = void> =
@@ -143,6 +145,39 @@ export async function toggleSubObjectiu(
     return { ok: true, data: undefined };
   } catch (error) {
     return fail(error, "No s'ha pogut actualitzar la subtasca");
+  }
+}
+
+export async function updateSubObjectiu(
+  input: unknown,
+): Promise<ActionResult> {
+  try {
+    const data = subObjectiuUpdateSchema.parse(input);
+    await prisma.subObjectiu.update({
+      where: { id: data.id },
+      data: { titol: data.titol },
+    });
+    revalidateObjectius();
+    return { ok: true, data: undefined };
+  } catch (error) {
+    return fail(error, "No s'ha pogut actualitzar la subtasca");
+  }
+}
+
+export async function deleteSubObjectiu(
+  input: unknown,
+): Promise<ActionResult> {
+  try {
+    const { id } = subObjectiuDeleteSchema.parse(input);
+    const sub = await prisma.subObjectiu.findUnique({ where: { id } });
+    if (!sub) throw new Error("Subtasca no trobada");
+
+    await prisma.subObjectiu.delete({ where: { id } });
+    await syncObjectiuProgress(sub.objectiuId);
+    revalidateObjectius();
+    return { ok: true, data: undefined };
+  } catch (error) {
+    return fail(error, "No s'ha pogut eliminar la subtasca");
   }
 }
 

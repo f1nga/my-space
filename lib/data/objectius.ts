@@ -72,10 +72,16 @@ export async function syncObjectiuProgress(objectiuId: string): Promise<number> 
       ? computeProgressFromSubtasques(objectiu.subtasques)
       : objectiu.progress;
 
-  const estat =
-    progress >= 100 && objectiu.estat === "EN_PROGRES"
-      ? "COMPLETAT"
-      : objectiu.estat;
+  let estat = objectiu.estat;
+  if (objectiu.estat !== "ABANDONAT") {
+    if (objectiu.subtasques.length > 0) {
+      estat = progress >= 100 ? "COMPLETAT" : "EN_PROGRES";
+    } else if (progress >= 100 && estat === "EN_PROGRES") {
+      estat = "COMPLETAT";
+    } else if (progress < 100 && estat === "COMPLETAT") {
+      estat = "EN_PROGRES";
+    }
+  }
 
   await prisma.objectiu.update({
     where: { id: objectiuId },
