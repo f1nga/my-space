@@ -3,15 +3,18 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard,
-  KanbanSquare,
   CalendarDays,
-  StickyNote,
+  LayoutDashboard,
+  PanelLeft,
+  PanelLeftClose,
   Sparkles,
+  StickyNote,
   Target,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { useSidebar } from "./SidebarProvider";
 
 type NavItem = {
   href: string;
@@ -21,72 +24,223 @@ type NavItem = {
 
 const NAV: NavItem[] = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/board", label: "Tauler", icon: KanbanSquare },
   { href: "/calendar", label: "Calendari", icon: CalendarDays },
   { href: "/notes", label: "Notes", icon: StickyNote },
   { href: "/objectius", label: "Objectius", icon: Target },
 ];
 
-export function Sidebar() {
-  const pathname = usePathname();
+function SidebarSeparator() {
+  return (
+    <div
+      className="mx-3 border-t border-border/50"
+      role="separator"
+      aria-hidden
+    />
+  );
+}
+
+function SidebarToggle({
+  expanded,
+  showLabels,
+  isMobile,
+  onCollapse,
+  onExpand,
+  onCloseMobile,
+}: {
+  expanded: boolean;
+  showLabels: boolean;
+  isMobile: boolean;
+  onCollapse: () => void;
+  onExpand: () => void;
+  onCloseMobile: () => void;
+}) {
+  const collapseLabel = isMobile ? "Tancar menú" : "Replegar barra lateral";
+  const expandLabel = "Expandir barra lateral";
+
+  function handleClick() {
+    if (isMobile) {
+      if (expanded) onCloseMobile();
+      else onExpand();
+      return;
+    }
+    if (expanded) onCollapse();
+    else onExpand();
+  }
+
+  const Icon = expanded
+    ? isMobile
+      ? X
+      : PanelLeftClose
+    : PanelLeft;
+  const label = expanded ? collapseLabel : expandLabel;
 
   return (
-    <aside
-      aria-label="Navegacio principal"
-      className="fixed inset-y-0 left-0 z-30 flex w-16 md:w-64 flex-col border-r border-[var(--color-border)] bg-[var(--color-sidebar)]"
+    <button
+      type="button"
+      onClick={handleClick}
+      title={showLabels ? undefined : label}
+      aria-label={label}
+      className={cn(
+        "flex w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-text-muted transition-colors hover:bg-surface hover:text-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+        showLabels ? "justify-start" : "justify-center",
+      )}
     >
-      <div className="flex h-16 items-center gap-2 border-b border-[var(--color-border)] px-3 md:px-5">
-        <span className="grid h-9 w-9 place-items-center rounded-xl bg-[var(--color-accent-soft)] text-[var(--color-accent)]">
-          <Sparkles className="h-5 w-5" aria-hidden />
-        </span>
-        <span className="hidden text-base font-semibold tracking-tight md:inline">
-          My Space
-        </span>
-      </div>
+      <Icon className="h-5 w-5 shrink-0" aria-hidden />
+      {showLabels ? <span className="truncate">{label}</span> : null}
+    </button>
+  );
+}
 
-      <nav className="flex-1 space-y-1 p-2 md:p-3">
-        {NAV.map((item) => {
-          const isActive =
-            item.href === "/"
-              ? pathname === "/"
-              : pathname === item.href || pathname.startsWith(`${item.href}/`);
-          const Icon = item.icon;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              aria-current={isActive ? "page" : undefined}
-              title={item.label}
+function NavLinks({
+  pathname,
+  showLabels,
+  onNavigate,
+}: {
+  pathname: string;
+  showLabels: boolean;
+  onNavigate?: () => void;
+}) {
+  return (
+    <>
+      {NAV.map((item) => {
+        const isActive =
+          item.href === "/"
+            ? pathname === "/"
+            : pathname === item.href || pathname.startsWith(`${item.href}/`);
+        const Icon = item.icon;
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            onClick={onNavigate}
+            aria-current={isActive ? "page" : undefined}
+            title={showLabels ? undefined : item.label}
+            className={cn(
+              "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+              showLabels ? "justify-start" : "justify-center",
+              isActive
+                ? "bg-accent-soft text-accent"
+                : "text-text-muted hover:bg-surface hover:text-text",
+            )}
+          >
+            <Icon
               className={cn(
-                "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-                "md:justify-start justify-center",
-                isActive
-                  ? "bg-[var(--color-accent-soft)] text-[var(--color-accent)]"
-                  : "text-[var(--color-text-muted)] hover:bg-[var(--color-surface)] hover:text-[var(--color-text)]",
+                "h-5 w-5 shrink-0",
+                isActive ? "text-accent" : "text-current",
               )}
-            >
-              <Icon
-                className={cn(
-                  "h-5 w-5 shrink-0",
-                  isActive ? "text-[var(--color-accent)]" : "text-current",
-                )}
-                aria-hidden
-              />
-              <span className="hidden md:inline">{item.label}</span>
-            </Link>
-          );
-        })}
-      </nav>
+              aria-hidden
+            />
+            {showLabels ? (
+              <span className="truncate">{item.label}</span>
+            ) : null}
+          </Link>
+        );
+      })}
+    </>
+  );
+}
 
-      <div className="border-t border-[var(--color-border)] p-3 md:p-4">
-        <div className="flex items-center justify-center md:justify-between">
-          <div className="hidden text-xs text-[var(--color-text-subtle)] md:block">
-            <p className="font-medium text-[var(--color-text-muted)]">My Space</p>
-            <p>Productivitat personal</p>
+export function Sidebar() {
+  const pathname = usePathname();
+  const {
+    collapsed,
+    mobileOpen,
+    isMobile,
+    toggleCollapsed,
+    openMobile,
+    closeMobile,
+  } = useSidebar();
+
+  const expanded = isMobile ? mobileOpen : !collapsed;
+  const showLabels = expanded;
+
+  return (
+    <>
+      {isMobile && mobileOpen ? (
+        <button
+          type="button"
+          aria-label="Tancar menú"
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
+          onClick={closeMobile}
+        />
+      ) : null}
+
+      <aside
+        aria-label="Navegació principal"
+        aria-expanded={expanded}
+        className={cn(
+          "fixed inset-y-0 left-0 z-50 flex flex-col border-r border-border bg-sidebar transition-[width] duration-300 ease-in-out",
+          expanded ? "w-64" : "w-16",
+          isMobile && mobileOpen && "shadow-pop",
+        )}
+      >
+        <div
+          className={cn(
+            "flex h-16 shrink-0 items-center px-3",
+            showLabels ? "gap-2" : "justify-center px-2",
+          )}
+        >
+          <div
+            className={cn(
+              "flex min-w-0 items-center gap-2",
+              !showLabels && "justify-center",
+            )}
+          >
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent">
+              <Sparkles className="h-5 w-5" aria-hidden />
+            </span>
+            {showLabels ? (
+              <span className="truncate text-base font-semibold tracking-tight">
+                My Space
+              </span>
+            ) : null}
           </div>
-          <ThemeToggle />
         </div>
-      </div>
-    </aside>
+
+        <SidebarSeparator />
+
+        <div className="shrink-0 p-2">
+          <SidebarToggle
+            expanded={expanded}
+            showLabels={showLabels}
+            isMobile={isMobile}
+            onCollapse={toggleCollapsed}
+            onExpand={isMobile ? openMobile : toggleCollapsed}
+            onCloseMobile={closeMobile}
+          />
+        </div>
+
+        <SidebarSeparator />
+
+        <nav className="flex-1 space-y-1 overflow-y-auto p-2">
+          <NavLinks
+            pathname={pathname}
+            showLabels={showLabels}
+            onNavigate={isMobile ? closeMobile : undefined}
+          />
+        </nav>
+
+        <SidebarSeparator />
+
+        <div className={cn("shrink-0 p-2", showLabels && "p-3")}>
+          <div
+            className={cn(
+              "flex items-center",
+              showLabels ? "justify-between gap-2" : "justify-center",
+            )}
+          >
+            {showLabels ? (
+              <div className="min-w-0 text-xs text-text-subtle">
+                <p className="truncate font-medium text-text-muted">
+                  My Space
+                </p>
+                <p className="truncate">Productivitat personal</p>
+              </div>
+            ) : null}
+            <ThemeToggle />
+          </div>
+        </div>
+      </aside>
+    </>
   );
 }
