@@ -12,6 +12,7 @@ import {
   parseViewParam,
   type CalendarItem,
 } from "@/lib/calendar";
+import { getTranslations } from "@/lib/i18n/get-dictionary";
 import { serializeCalendarItems } from "@/lib/serialization";
 
 export const dynamic = "force-dynamic";
@@ -25,6 +26,7 @@ export default async function CalendarPage({ searchParams }: CalendarPageProps) 
   const view = parseViewParam(params.view);
   const date = parseDateParam(params.date);
   const range = getRangeForView(date, view);
+  const t = await getTranslations();
 
   const [events, tasks] = await Promise.all([
     getEventsInRange(range.start, range.end),
@@ -72,9 +74,9 @@ export default async function CalendarPage({ searchParams }: CalendarPageProps) 
   return (
     <div className="flex min-h-screen flex-col">
       <PageHeader
-        eyebrow="Calendari"
-        title="La teva agenda"
-        description="Esdeveniments i tasques amb venciment en una sola vista."
+        eyebrow={t("calendar.eyebrow")}
+        title={t("calendar.title")}
+        description={t("calendar.description")}
       />
       <section className="flex-1 space-y-4 px-6 py-6 md:px-10">
         <CalendarHeader date={date} view={view} />

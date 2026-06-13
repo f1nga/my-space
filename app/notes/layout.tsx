@@ -1,6 +1,7 @@
 import { getAllNotes } from "@/lib/data/notes";
 import { NoteList } from "@/components/notes/NoteList";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { getTranslations } from "@/lib/i18n/get-dictionary";
 
 export const dynamic = "force-dynamic";
 
@@ -10,6 +11,7 @@ export default async function NotesLayout({
   children: React.ReactNode;
 }) {
   const notes = await getAllNotes();
+  const t = await getTranslations();
   const summaries = notes.map((note) => ({
     id: note.id,
     title: note.title,
@@ -21,9 +23,9 @@ export default async function NotesLayout({
   return (
     <div className="flex min-h-screen flex-col">
       <PageHeader
-        eyebrow="Notes"
-        title="Bloc personal"
-        description="Apunts rapids amb desat automatic. Selecciona o crea una nota."
+        eyebrow={t("notes.eyebrow")}
+        title={t("notes.title")}
+        description={t("notes.description")}
       />
       <section className="grid flex-1 grid-cols-1 md:grid-cols-[320px_1fr]">
         <NoteList notes={summaries} />

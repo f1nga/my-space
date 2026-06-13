@@ -1,6 +1,9 @@
+"use client";
+
 import Link from "next/link";
-import { CalendarDays, CheckCircle2, Loader2 } from "lucide-react";
+import { CheckCircle2, Loader2 } from "lucide-react";
 import { Card } from "@/components/ui/Card";
+import { useI18n } from "@/lib/i18n/client";
 import type { TaskStatus } from "@/lib/types";
 
 interface StatsCardsProps {
@@ -50,30 +53,32 @@ function Stat({ href, label, value, helper, icon: Icon, tone }: StatProps) {
   );
 }
 
-export function StatsCards({ counts, notes, upcomingEvents }: StatsCardsProps) {
+export function StatsCards({ counts }: StatsCardsProps) {
+  const { t } = useI18n();
+
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <Stat
         href="/board"
-        label="Per fer"
+        label={t("taskStatus.todo")}
         value={counts.todo}
-        helper="Tasques pendents"
+        helper={t("dashboard.pendingTasks")}
         icon={Loader2}
         tone="muted"
       />
       <Stat
         href="/board"
-        label="En proces"
+        label={t("taskStatus.doing")}
         value={counts.doing}
-        helper="Tasques actives"
+        helper={t("dashboard.activeTasks")}
         icon={Loader2}
         tone="warning"
       />
       <Stat
         href="/board"
-        label="Fet"
+        label={t("taskStatus.done")}
         value={counts.done}
-        helper="Tasques completades"
+        helper={t("dashboard.completedTasks")}
         icon={CheckCircle2}
         tone="accent"
       />

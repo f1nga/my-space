@@ -1,7 +1,10 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowRight, StickyNote } from "lucide-react";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { useI18n } from "@/lib/i18n/client";
 
 interface NoteItem {
   id: string;
@@ -10,35 +13,47 @@ interface NoteItem {
   updatedAt: Date;
 }
 
-function relativeDate(date: Date): string {
-  const diff = Date.now() - date.getTime();
-  const minutes = Math.round(diff / 60_000);
-  if (minutes < 60) return `fa ${Math.max(1, minutes)} min`;
-  const hours = Math.round(minutes / 60);
-  if (hours < 24) return `fa ${hours} h`;
-  const days = Math.round(hours / 24);
-  if (days < 7) return `fa ${days} dies`;
-  return date.toLocaleDateString("ca-ES", { day: "numeric", month: "short" });
-}
-
 export function RecentNotes({ notes }: { notes: NoteItem[] }) {
+  const { t, intlLocale } = useI18n();
+
+  function relativeDate(date: Date): string {
+    const diff = Date.now() - date.getTime();
+    const minutes = Math.round(diff / 60_000);
+    if (minutes < 60) {
+      return t("relative.agoMinutes", { count: Math.max(1, minutes) });
+    }
+    const hours = Math.round(minutes / 60);
+    if (hours < 24) {
+      return t("relative.agoHours", { count: hours });
+    }
+    const days = Math.round(hours / 24);
+    if (days < 7) {
+      return t("relative.agoDays", { count: days });
+    }
+    return date.toLocaleDateString(intlLocale, {
+      day: "numeric",
+      month: "short",
+    });
+  }
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Notes recents</CardTitle>
+        <CardTitle>{t("dashboard.recentNotes")}</CardTitle>
         <Link
           href="/notes"
           className="inline-flex items-center gap-1 text-xs text-[var(--color-text-muted)] transition-colors hover:text-[var(--color-text)]"
         >
-          Totes <ArrowRight className="h-3 w-3" aria-hidden />
+          {t("dashboard.allNotes")}{" "}
+          <ArrowRight className="h-3 w-3" aria-hidden />
         </Link>
       </CardHeader>
       <CardBody>
         {notes.length === 0 ? (
           <EmptyState
             icon={StickyNote}
-            title="Encara no tens notes"
-            description="Crea&apos;n una des de la secció Notes."
+            title={t("dashboard.noNotes")}
+            description={t("dashboard.noNotesDescription")}
           />
         ) : (
           <ul className="space-y-1">
@@ -49,7 +64,7 @@ export function RecentNotes({ notes }: { notes: NoteItem[] }) {
                   className="block rounded-lg px-2 py-2 transition-colors hover:bg-[var(--color-surface)]"
                 >
                   <p className="truncate text-sm font-medium text-[var(--color-text)]">
-                    {note.title || "Sense titol"}
+                    {note.title || t("common.noTitle")}
                   </p>
                   {note.content ? (
                     <p className="mt-0.5 line-clamp-1 text-xs text-[var(--color-text-muted)]">

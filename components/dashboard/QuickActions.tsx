@@ -9,6 +9,7 @@ import { EventFormDialog } from "@/components/calendar/EventFormDialog";
 import type { BoardView } from "@/components/board/types";
 import { createNote } from "@/lib/actions/notes";
 import { useRouter } from "next/navigation";
+import { useI18n } from "@/lib/i18n/client";
 
 interface QuickActionsProps {
   boards: BoardView[];
@@ -16,12 +17,13 @@ interface QuickActionsProps {
 
 export function QuickActions({ boards }: QuickActionsProps) {
   const router = useRouter();
+  const { t } = useI18n();
   const [taskOpen, setTaskOpen] = useState(false);
   const [eventOpen, setEventOpen] = useState(false);
 
   async function handleNewNote() {
     const result = await createNote({
-      title: "Nota sense titol",
+      title: t("dashboard.defaultNoteTitle"),
       content: "",
       pinned: false,
     });
@@ -31,17 +33,18 @@ export function QuickActions({ boards }: QuickActionsProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Accessos ràpids</CardTitle>
+        <CardTitle>{t("dashboard.quickActions")}</CardTitle>
       </CardHeader>
       <CardBody className="grid grid-cols-1 gap-2 sm:grid-cols-3">
         <Button variant="secondary" onClick={() => setTaskOpen(true)}>
-          <ListPlus className="h-4 w-4" aria-hidden /> Nova tasca
+          <ListPlus className="h-4 w-4" aria-hidden /> {t("dashboard.newTask")}
         </Button>
         <Button variant="secondary" onClick={() => setEventOpen(true)}>
-          <CalendarPlus className="h-4 w-4" aria-hidden /> Nou esdeveniment
+          <CalendarPlus className="h-4 w-4" aria-hidden />{" "}
+          {t("dashboard.newEvent")}
         </Button>
         <Button variant="secondary" onClick={handleNewNote}>
-          <FilePlus className="h-4 w-4" aria-hidden /> Nova nota
+          <FilePlus className="h-4 w-4" aria-hidden /> {t("dashboard.newNote")}
         </Button>
       </CardBody>
 

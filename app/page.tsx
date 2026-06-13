@@ -7,7 +7,10 @@ import { QuickActions } from "@/components/dashboard/QuickActions";
 import { getDashboardData } from "@/lib/data/dashboard";
 import { getBoards } from "@/lib/data/boards";
 import type { BoardView } from "@/components/board/types";
-import { formatDateCa } from "@/lib/utils";
+import { getLocale } from "@/lib/i18n/get-locale";
+import { getTranslations } from "@/lib/i18n/get-dictionary";
+import { getIntlLocaleId } from "@/lib/i18n/date-locale";
+import { formatDate } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -15,16 +18,22 @@ function capitalize(value: string): string {
   return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
-function greeting(): string {
-  const hour = new Date().getHours();
-  if (hour < 13) return "Bon dia";
-  if (hour < 20) return "Bona tarda";
-  return "Bona nit";
+function greetingKey(hour: number): "dashboard.greetingMorning" | "dashboard.greetingAfternoon" | "dashboard.greetingEvening" {
+  if (hour < 13) return "dashboard.greetingMorning";
+  if (hour < 20) return "dashboard.greetingAfternoon";
+  return "dashboard.greetingEvening";
 }
 
 export default async function DashboardPage() {
-  const [data, boards] = await Promise.all([getDashboardData(), getBoards()]);
-  const today = capitalize(formatDateCa(new Date()));
+  const [data, boards, locale, t] = await Promise.all([
+    getDashboardData(),
+    getBoards(),
+    getLocale(),
+    getTranslations(),
+  ]);
+  const intlLocale = getIntlLocaleId(locale);
+  const today = capitalize(formatDate(new Date(), intlLocale));
+  const hour = new Date().getHours();
 
   const boardViews: BoardView[] = boards.map((board) => ({
     id: board.id,
@@ -36,8 +45,8 @@ export default async function DashboardPage() {
     <div className="flex min-h-screen flex-col">
       <PageHeader
         eyebrow={today}
-        title={greeting()}
-        description="Resum del que tens entre mans avui."
+        title={t(greetingKey(hour))}
+        description={t("dashboard.description")}
       />
       <section className="flex-1 space-y-6 px-6 py-8 md:px-10">
         <StatsCards

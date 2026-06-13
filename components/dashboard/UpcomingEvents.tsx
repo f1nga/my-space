@@ -1,8 +1,11 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowRight, CalendarClock } from "lucide-react";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { cn, formatTimeCa } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n/client";
+import { cn, formatTime } from "@/lib/utils";
 
 interface EventItem {
   id: string;
@@ -21,39 +24,42 @@ const COLOR_DOTS: Record<string, string> = {
   zinc: "bg-zinc-500",
 };
 
-function relativeDay(date: Date): string {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const target = new Date(date);
-  target.setHours(0, 0, 0, 0);
-  const diff = Math.round((target.getTime() - today.getTime()) / 86_400_000);
-  if (diff === 0) return "Avui";
-  if (diff === 1) return "Dema";
-  return new Date(date).toLocaleDateString("ca-ES", {
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-  });
-}
-
 export function UpcomingEvents({ events }: { events: EventItem[] }) {
+  const { t, intlLocale } = useI18n();
+
+  function relativeDay(date: Date): string {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const target = new Date(date);
+    target.setHours(0, 0, 0, 0);
+    const diff = Math.round((target.getTime() - today.getTime()) / 86_400_000);
+    if (diff === 0) return t("relative.today");
+    if (diff === 1) return t("relative.tomorrow");
+    return new Date(date).toLocaleDateString(intlLocale, {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+    });
+  }
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Propers esdeveniments</CardTitle>
+        <CardTitle>{t("dashboard.upcomingEvents")}</CardTitle>
         <Link
           href="/calendar"
           className="inline-flex items-center gap-1 text-xs text-[var(--color-text-muted)] transition-colors hover:text-[var(--color-text)]"
         >
-          Calendari <ArrowRight className="h-3 w-3" aria-hidden />
+          {t("dashboard.calendarLink")}{" "}
+          <ArrowRight className="h-3 w-3" aria-hidden />
         </Link>
       </CardHeader>
       <CardBody>
         {events.length === 0 ? (
           <EmptyState
             icon={CalendarClock}
-            title="Cap esdeveniment proper"
-            description="Tens els pròxims 7 dies lliures."
+            title={t("dashboard.noUpcomingEvents")}
+            description={t("dashboard.noUpcomingEventsDescription")}
           />
         ) : (
           <ul className="space-y-2">
@@ -75,7 +81,9 @@ export function UpcomingEvents({ events }: { events: EventItem[] }) {
                   </p>
                   <p className="text-[11px] text-[var(--color-text-muted)]">
                     {relativeDay(event.startsAt)}
-                    {!event.allDay ? ` · ${formatTimeCa(event.startsAt)}` : " · tot el dia"}
+                    {!event.allDay
+                      ? ` · ${formatTime(event.startsAt, intlLocale)}`
+                      : ` · ${t("relative.allDay")}`}
                   </p>
                 </div>
               </li>

@@ -6,7 +6,8 @@ import { ArrowRight, CheckCircle2, Circle } from "lucide-react";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { updateTask } from "@/lib/actions/tasks";
-import { cn, formatTimeCa } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n/client";
+import { cn, formatTime } from "@/lib/utils";
 
 interface TaskItem {
   id: string;
@@ -21,12 +22,14 @@ interface TodayTasksProps {
 }
 
 function TaskRow({ task, tone }: { task: TaskItem; tone: "today" | "overdue" }) {
+  const { t, intlLocale } = useI18n();
   const [pending, startTransition] = useTransition();
+
   return (
     <li className="flex items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-[var(--color-surface)]">
       <button
         type="button"
-        aria-label="Marcar com a feta"
+        aria-label={t("dashboard.markDone")}
         disabled={pending}
         onClick={() =>
           startTransition(async () => {
@@ -52,7 +55,10 @@ function TaskRow({ task, tone }: { task: TaskItem; tone: "today" | "overdue" }) 
                 : "text-[var(--color-text-muted)]",
             )}
           >
-            {tone === "overdue" ? "Endarrerida" : "Avui"} · {formatTimeCa(task.dueDate)}
+            {tone === "overdue"
+              ? t("relative.overdueLabel")
+              : t("relative.today")}
+            · {formatTime(task.dueDate, intlLocale)}
           </p>
         ) : null}
       </div>
@@ -61,30 +67,33 @@ function TaskRow({ task, tone }: { task: TaskItem; tone: "today" | "overdue" }) 
 }
 
 export function TodayTasks({ today, overdue }: TodayTasksProps) {
+  const { t } = useI18n();
   const hasContent = today.length + overdue.length > 0;
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Tasques d&apos;avui</CardTitle>
+        <CardTitle>{t("dashboard.todayTasks")}</CardTitle>
         <Link
           href="/board"
           className="inline-flex items-center gap-1 text-xs text-[var(--color-text-muted)] transition-colors hover:text-[var(--color-text)]"
         >
-          Tauler complet <ArrowRight className="h-3 w-3" aria-hidden />
+          {t("dashboard.fullBoard")}{" "}
+          <ArrowRight className="h-3 w-3" aria-hidden />
         </Link>
       </CardHeader>
       <CardBody className="space-y-4">
         {!hasContent ? (
           <EmptyState
-            title="Cap tasca per avui"
-            description="Aprofita per planificar la setmana."
+            title={t("dashboard.noTasksToday")}
+            description={t("dashboard.noTasksTodayDescription")}
           />
         ) : (
           <>
             {overdue.length > 0 ? (
               <section>
                 <p className="mb-1 text-[10px] font-medium uppercase tracking-wider text-[var(--color-danger)]">
-                  Endarrerides
+                  {t("dashboard.overdueSection")}
                 </p>
                 <ul className="space-y-1">
                   {overdue.map((task) => (
@@ -96,7 +105,7 @@ export function TodayTasks({ today, overdue }: TodayTasksProps) {
             {today.length > 0 ? (
               <section>
                 <p className="mb-1 text-[10px] font-medium uppercase tracking-wider text-[var(--color-text-subtle)]">
-                  Avui
+                  {t("dashboard.todaySection")}
                 </p>
                 <ul className="space-y-1">
                   {today.map((task) => (

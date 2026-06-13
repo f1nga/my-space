@@ -2,6 +2,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { BoardClient } from "@/components/board/BoardClient";
 import { getBoards } from "@/lib/data/boards";
 import { getTasksGroupedByStatus } from "@/lib/data/tasks";
+import { getTranslations } from "@/lib/i18n/get-dictionary";
 import { TASK_STATUSES } from "@/lib/types";
 import type { TaskStatus } from "@/lib/types";
 import type { BoardTask, BoardView, GroupedTasks } from "@/components/board/types";
@@ -9,9 +10,10 @@ import type { BoardTask, BoardView, GroupedTasks } from "@/components/board/type
 export const dynamic = "force-dynamic";
 
 export default async function BoardPage() {
-  const [grouped, boards] = await Promise.all([
+  const [grouped, boards, t] = await Promise.all([
     getTasksGroupedByStatus(),
     getBoards(),
+    getTranslations(),
   ]);
 
   const boardViews: BoardView[] = boards.map((board) => ({
@@ -44,9 +46,9 @@ export default async function BoardPage() {
   return (
     <div className="flex min-h-screen flex-col">
       <PageHeader
-        eyebrow="Tauler"
-        title="Kanban"
-        description="Organitza les tasques entre taulers i columnes Per fer, En proces i Fet."
+        eyebrow={t("board.eyebrow")}
+        title={t("board.title")}
+        description={t("board.description")}
       />
       <section className="flex-1 px-6 py-6 md:px-10">
         <BoardClient initial={initial} initialBoards={boardViews} />
