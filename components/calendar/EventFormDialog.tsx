@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { Dialog } from "@/components/ui/Dialog";
 import { Button } from "@/components/ui/Button";
+import { Input, Textarea, formCheckClass } from "@/components/ui/Field";
 import { createEvent, updateEvent } from "@/lib/actions/events";
 import { EVENT_COLORS, type EventColor } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -99,7 +100,7 @@ function EventFormContent({
         >
           Titol
         </label>
-        <input
+        <Input
           id="event-title"
           type="text"
           value={title}
@@ -107,7 +108,6 @@ function EventFormContent({
           autoFocus
           required
           maxLength={200}
-          className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text focus:border-accent focus:outline-none"
         />
       </div>
 
@@ -118,14 +118,14 @@ function EventFormContent({
         >
           Descripcio
         </label>
-        <textarea
+        <Textarea
           id="event-description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           rows={3}
           maxLength={5000}
           placeholder="Opcional"
-          className="w-full resize-y rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text focus:border-accent focus:outline-none"
+          className="resize-y"
         />
       </div>
 
@@ -134,7 +134,10 @@ function EventFormContent({
           type="checkbox"
           checked={allDay}
           onChange={(e) => setAllDay(e.target.checked)}
-          className="h-4 w-4 rounded border-border bg-surface text-accent focus:ring-accent-ring"
+          className={cn(
+            "h-4 w-4 rounded border-border bg-surface text-accent",
+            formCheckClass,
+          )}
         />
         Tot el dia
       </label>
@@ -147,13 +150,12 @@ function EventFormContent({
           >
             Inici
           </label>
-          <input
+          <Input
             id="event-start"
             type={allDay ? "date" : "datetime-local"}
             value={startsAt}
             onChange={(e) => setStartsAt(e.target.value)}
             required
-            className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text focus:border-accent focus:outline-none"
           />
         </div>
         <div className="space-y-1.5">
@@ -163,12 +165,11 @@ function EventFormContent({
           >
             Final (opcional)
           </label>
-          <input
+          <Input
             id="event-end"
             type={allDay ? "date" : "datetime-local"}
             value={endsAt}
             onChange={(e) => setEndsAt(e.target.value)}
-            className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text focus:border-accent focus:outline-none"
           />
         </div>
       </div>
