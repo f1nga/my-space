@@ -6,9 +6,11 @@ import {
   Pencil,
   Trash2,
 } from "lucide-react";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { Card } from "@/components/ui/Card";
 import { deleteObjectiu } from "@/lib/actions/objectius";
+import { ConfirmDialogHost } from "@/components/ui/ConfirmDialog";
+import { useConfirmDialog } from "@/components/ui/useConfirmDialog";
 import {
   CATEGORIA_STYLES,
   timeLabel,
@@ -29,7 +31,7 @@ interface ObjectiuCardProps {
 
 export function ObjectiuCard({ objectiu, onEdit, onOpen }: ObjectiuCardProps) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [pendingDelete, startDelete] = useTransition();
+  const { confirm, dialogProps } = useConfirmDialog();
   const styles = CATEGORIA_STYLES[objectiu.categoria];
   const timeProgress = timelineProgress(
     new Date(objectiu.dataInici),
@@ -120,14 +122,15 @@ export function ObjectiuCard({ objectiu, onEdit, onOpen }: ObjectiuCardProps) {
                 </button>
                 <button
                   type="button"
-                  disabled={pendingDelete}
-                  className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-sm text-[var(--color-danger)] hover:bg-[var(--color-danger-soft)] disabled:cursor-not-allowed disabled:opacity-50"
+                  className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-sm text-[var(--color-danger)] hover:bg-[var(--color-danger-soft)]"
                   onClick={() => {
-                    if (!confirm("Vols eliminar aquest objectiu?")) return;
-                    startDelete(async () => {
-                      await deleteObjectiu(objectiu.id);
-                    });
                     setMenuOpen(false);
+                    confirm({
+                      title: "Eliminar objectiu",
+                      description:
+                        "Vols eliminar aquest objectiu? Aquesta acció no es pot desfer.",
+                      onConfirm: () => deleteObjectiu(objectiu.id),
+                    });
                   }}
                 >
                   <Trash2 className="h-3.5 w-3.5" aria-hidden />
@@ -209,6 +212,7 @@ export function ObjectiuCard({ objectiu, onEdit, onOpen }: ObjectiuCardProps) {
           })}
         </p>
       </div>
+      <ConfirmDialogHost dialogProps={dialogProps} />
     </Card>
   );
 }

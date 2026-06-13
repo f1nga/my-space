@@ -4,6 +4,7 @@ import { Plus, Trash2 } from "lucide-react";
 import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/Button";
 import { Dialog } from "@/components/ui/Dialog";
+import { Input, Select, Textarea } from "@/components/ui/Field";
 import { createObjectiu, updateObjectiu } from "@/lib/actions/objectius";
 import {
   CATEGORIA_OBJECTIU_LABELS,
@@ -110,7 +111,7 @@ export function ObjectiuFormDialog({
           >
             Títol
           </label>
-          <input
+          <Input
             id="objectiu-titol"
             type="text"
             value={titol}
@@ -118,7 +119,6 @@ export function ObjectiuFormDialog({
             autoFocus
             required
             maxLength={200}
-            className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text placeholder:text-text-subtle focus:border-accent focus:outline-none"
             placeholder="Per exemple, estalviar 3.000 €"
           />
         </div>
@@ -130,13 +130,13 @@ export function ObjectiuFormDialog({
           >
             Descripció
           </label>
-          <textarea
+          <Textarea
             id="objectiu-descripcio"
             value={descripcio}
             onChange={(e) => setDescripcio(e.target.value)}
             rows={3}
             maxLength={2000}
-            className="w-full resize-none rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text placeholder:text-text-subtle focus:border-accent focus:outline-none"
+            className="resize-none"
             placeholder="Detalls opcionals sobre la fita..."
           />
         </div>
@@ -149,13 +149,12 @@ export function ObjectiuFormDialog({
             >
               Data d&apos;inici
             </label>
-            <input
+            <Input
               id="objectiu-inici"
               type="date"
               value={dataInici}
               onChange={(e) => setDataInici(e.target.value)}
               required
-              className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text focus:border-accent focus:outline-none"
             />
           </div>
           <div className="space-y-1.5">
@@ -165,13 +164,12 @@ export function ObjectiuFormDialog({
             >
               Data final
             </label>
-            <input
+            <Input
               id="objectiu-final"
               type="date"
               value={dataFinal}
               onChange={(e) => setDataFinal(e.target.value)}
               required
-              className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text focus:border-accent focus:outline-none"
             />
           </div>
         </div>
@@ -184,20 +182,19 @@ export function ObjectiuFormDialog({
             >
               Categoria
             </label>
-            <select
+            <Select
               id="objectiu-categoria"
               value={categoria}
               onChange={(e) =>
                 setCategoria(e.target.value as CategoriaObjectiu)
               }
-              className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text focus:border-accent focus:outline-none"
             >
               {CATEGORIES_OBJECTIU.map((cat) => (
                 <option key={cat} value={cat}>
                   {CATEGORIA_OBJECTIU_LABELS[cat]}
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
 
           {editing && objectiu?.subtasques.length === 0 ? (
@@ -239,7 +236,7 @@ export function ObjectiuFormDialog({
             <div className="space-y-2">
               {subtasques.map((sub, index) => (
                 <div key={index} className="flex gap-2">
-                  <input
+                  <Input
                     type="text"
                     value={sub}
                     onChange={(e) =>
@@ -251,7 +248,7 @@ export function ObjectiuFormDialog({
                     }
                     maxLength={200}
                     placeholder={`Subtasca ${index + 1}`}
-                    className="flex-1 rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text placeholder:text-text-subtle focus:border-accent focus:outline-none"
+                    className="flex-1"
                   />
                   {subtasques.length > 1 ? (
                     <button

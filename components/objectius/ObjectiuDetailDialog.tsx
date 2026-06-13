@@ -13,6 +13,9 @@ import {
 import { useEffect, useState, useTransition } from "react";
 import { Button } from "@/components/ui/Button";
 import { Dialog } from "@/components/ui/Dialog";
+import { Input } from "@/components/ui/Field";
+import { ConfirmDialogHost } from "@/components/ui/ConfirmDialog";
+import { useConfirmDialog } from "@/components/ui/useConfirmDialog";
 import {
   completeObjectiu,
   createSubObjectiu,
@@ -47,6 +50,7 @@ export function ObjectiuDetailDialog({
   const [subError, setSubError] = useState<string | null>(null);
   const [editingSubId, setEditingSubId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState("");
+  const { confirm, dialogProps } = useConfirmDialog();
 
   useEffect(() => {
     if (!open) {
@@ -81,15 +85,18 @@ export function ObjectiuDetailDialog({
   }
 
   function handleDeleteSub(id: string, titol: string) {
-    if (!confirm(`Vols eliminar la subtasca «${titol}»?`)) return;
-    setSubError(null);
-    if (editingSubId === id) {
-      setEditingSubId(null);
-      setEditTitle("");
-    }
-    startTransition(async () => {
-      const result = await deleteSubObjectiu({ id });
-      if (!result.ok) setSubError(result.error);
+    confirm({
+      title: "Eliminar subtasca",
+      description: `Vols eliminar la subtasca «${titol}»? Aquesta acció no es pot desfer.`,
+      onConfirm: async () => {
+        setSubError(null);
+        if (editingSubId === id) {
+          setEditingSubId(null);
+          setEditTitle("");
+        }
+        const result = await deleteSubObjectiu({ id });
+        if (!result.ok) setSubError(result.error);
+      },
     });
   }
 
@@ -160,6 +167,7 @@ export function ObjectiuDetailDialog({
   }
 
   return (
+    <>
     <Dialog
       open={open}
       onClose={onClose}
@@ -229,7 +237,7 @@ export function ObjectiuDetailDialog({
               {objectiu.subtasques.map((sub) =>
                 editingSubId === sub.id ? (
                   <li key={sub.id} className="flex gap-2">
-                    <input
+                    <Input
                       type="text"
                       value={editTitle}
                       onChange={(e) => setEditTitle(e.target.value)}
@@ -244,7 +252,7 @@ export function ObjectiuDetailDialog({
                       maxLength={200}
                       autoFocus
                       aria-label="Editar títol de la subtasca"
-                      className="min-w-0 flex-1 rounded-xl border border-accent bg-surface px-3 py-2 text-sm text-text focus:outline-none"
+                      className="min-w-0 flex-1 rounded-xl border-accent"
                     />
                     <button
                       type="button"
@@ -362,14 +370,14 @@ export function ObjectiuDetailDialog({
 
           {objectiu.subtasques.length < 20 ? (
             <form onSubmit={handleAddSubtasca} className="flex gap-2">
-              <input
+              <Input
                 type="text"
                 value={newSubtasca}
                 onChange={(e) => setNewSubtasca(e.target.value)}
                 maxLength={200}
                 disabled={pending}
                 placeholder="Nova subtasca..."
-                className="min-w-0 flex-1 rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text placeholder:text-text-subtle focus:border-accent focus:outline-none"
+                className="min-w-0 flex-1"
               />
               <Button type="submit" size="sm" disabled={pending}>
                 <Plus className="h-4 w-4" aria-hidden />
@@ -417,5 +425,7 @@ export function ObjectiuDetailDialog({
         ) : null}
       </div>
     </Dialog>
+    <ConfirmDialogHost dialogProps={dialogProps} />
+    </>
   );
 }
