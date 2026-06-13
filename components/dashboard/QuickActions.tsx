@@ -6,10 +6,15 @@ import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { TaskFormDialog } from "@/components/board/TaskFormDialog";
 import { EventFormDialog } from "@/components/calendar/EventFormDialog";
+import type { BoardView } from "@/components/board/types";
 import { createNote } from "@/lib/actions/notes";
 import { useRouter } from "next/navigation";
 
-export function QuickActions() {
+interface QuickActionsProps {
+  boards: BoardView[];
+}
+
+export function QuickActions({ boards }: QuickActionsProps) {
   const router = useRouter();
   const [taskOpen, setTaskOpen] = useState(false);
   const [eventOpen, setEventOpen] = useState(false);
@@ -40,7 +45,11 @@ export function QuickActions() {
         </Button>
       </CardBody>
 
-      <TaskFormDialog open={taskOpen} onClose={() => setTaskOpen(false)} />
+      <TaskFormDialog
+        open={taskOpen}
+        onClose={() => setTaskOpen(false)}
+        boards={boards}
+      />
       <EventFormDialog open={eventOpen} onClose={() => setEventOpen(false)} />
     </Card>
   );

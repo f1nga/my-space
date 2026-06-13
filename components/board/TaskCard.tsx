@@ -3,14 +3,17 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Calendar, GripVertical, Pencil, Trash2 } from "lucide-react";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { deleteTask } from "@/lib/actions/tasks";
+import { ConfirmDialogHost } from "@/components/ui/ConfirmDialog";
+import { useConfirmDialog } from "@/components/ui/useConfirmDialog";
 import { cn, formatTimeCa } from "@/lib/utils";
-import type { BoardTask } from "./types";
+import type { BoardTask, BoardView } from "./types";
 import { TaskFormDialog } from "./TaskFormDialog";
 
 interface TaskCardProps {
   task: BoardTask;
+  boards: BoardView[];
   isOverlay?: boolean;
 }
 
@@ -31,7 +34,7 @@ function relativeDueLabel(date: Date): { text: string; tone: "danger" | "warning
   };
 }
 
-export function TaskCard({ task, isOverlay = false }: TaskCardProps) {
+export function TaskCard({ task, boards, isOverlay = false }: TaskCardProps) {
   const {
     attributes,
     listeners,
@@ -42,7 +45,7 @@ export function TaskCard({ task, isOverlay = false }: TaskCardProps) {
   } = useSortable({ id: task.id, data: { type: "task", task } });
 
   const [editOpen, setEditOpen] = useState(false);
-  const [pendingDelete, startDelete] = useTransition();
+  const { confirm, dialogProps } = useConfirmDialog();
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -111,14 +114,15 @@ export function TaskCard({ task, isOverlay = false }: TaskCardProps) {
             <button
               type="button"
               aria-label="Eliminar tasca"
-              disabled={pendingDelete}
-              onClick={() => {
-                if (!confirm("Vols eliminar aquesta tasca?")) return;
-                startDelete(async () => {
-                  await deleteTask(task.id);
-                });
-              }}
-              className="rounded p-1 text-[var(--color-text-muted)] hover:bg-[var(--color-danger-soft)] hover:text-[var(--color-danger)] disabled:opacity-40"
+              onClick={() =>
+                confirm({
+                  title: "Eliminar tasca",
+                  description:
+                    "Vols eliminar aquesta tasca? Aquesta acció no es pot desfer.",
+                  onConfirm: () => deleteTask(task.id),
+                })
+              }
+              className="rounded p-1 text-[var(--color-text-muted)] hover:bg-[var(--color-danger-soft)] hover:text-[var(--color-danger)]"
             >
               <Trash2 className="h-3.5 w-3.5" aria-hidden />
             </button>
@@ -130,7 +134,9 @@ export function TaskCard({ task, isOverlay = false }: TaskCardProps) {
         open={editOpen}
         onClose={() => setEditOpen(false)}
         task={task}
+        boards={boards}
       />
+      <ConfirmDialogHost dialogProps={dialogProps} />
     </>
   );
 }

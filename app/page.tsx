@@ -5,6 +5,8 @@ import { UpcomingEvents } from "@/components/dashboard/UpcomingEvents";
 import { RecentNotes } from "@/components/dashboard/RecentNotes";
 import { QuickActions } from "@/components/dashboard/QuickActions";
 import { getDashboardData } from "@/lib/data/dashboard";
+import { getBoards } from "@/lib/data/boards";
+import type { BoardView } from "@/components/board/types";
 import { formatDateCa } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -21,8 +23,14 @@ function greeting(): string {
 }
 
 export default async function DashboardPage() {
-  const data = await getDashboardData();
+  const [data, boards] = await Promise.all([getDashboardData(), getBoards()]);
   const today = capitalize(formatDateCa(new Date()));
+
+  const boardViews: BoardView[] = boards.map((board) => ({
+    id: board.id,
+    name: board.name,
+    position: board.position,
+  }));
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -38,7 +46,7 @@ export default async function DashboardPage() {
           upcomingEvents={data.totals.upcomingEvents}
         />
 
-        <QuickActions />
+        <QuickActions boards={boardViews} />
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2">

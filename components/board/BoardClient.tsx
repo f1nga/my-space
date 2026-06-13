@@ -1,5 +1,6 @@
 "use client";
 
+import { Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 import {
   DndContext,
@@ -17,13 +18,18 @@ import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { moveTask } from "@/lib/actions/tasks";
 import { TASK_STATUSES } from "@/lib/types";
 import type { TaskStatus } from "@/lib/types";
+import { cn } from "@/lib/utils";
+import { BoardFormDialog } from "./BoardFormDialog";
 import { Column } from "./Column";
 import { TaskCard } from "./TaskCard";
-import type { BoardTask, GroupedTasks } from "./types";
+import type { BoardTask, BoardView, GroupedTasks } from "./types";
 
 interface BoardClientProps {
   initial: GroupedTasks;
+  initialBoards: BoardView[];
 }
+
+type BoardFilter = "tots" | string;
 
 const POSITION_STEP = 1024;
 
@@ -55,17 +61,41 @@ function computePosition(
   return (before.position + after.position) / 2;
 }
 
-export function BoardClient({ initial }: BoardClientProps) {
-  const [groups, setGroups] = useState<GroupedTasks>(initial);
-  const [trackedInitial, setTrackedInitial] = useState(initial);
-  const [activeId, setActiveId] = useState<string | null>(null);
+function filterGroupsByBoard(
+  groups: GroupedTasks,
+  boardId: BoardFilter,
+): GroupedTasks {
+  if (boardId === "tots") return groups;
+  return Object.fromEntries(
+    TASK_STATUSES.map((status) => [
+      status,
+      groups[status].filter((task) => task.boardId === boardId),
+    ]),
+  ) as GroupedTasks;
+}
 
-  // Patro React 19: derivar estat durant el render quan canvia una prop,
-  // en lloc d'utilitzar un useEffect (regla react-hooks/set-state-in-effect).
+export function BoardClient({ initial, initialBoards }: BoardClientProps) {
+  const [groups, setGroups] = useState<GroupedTasks>(initial);
+  const [boards, setBoards] = useState<BoardView[]>(initialBoards);
+  const [trackedInitial, setTrackedInitial] = useState(initial);
+  const [trackedBoards, setTrackedBoards] = useState(initialBoards);
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [activeBoard, setActiveBoard] = useState<BoardFilter>("tots");
+  const [createBoardOpen, setCreateBoardOpen] = useState(false);
+
   if (trackedInitial !== initial) {
     setTrackedInitial(initial);
     setGroups(initial);
   }
+  if (trackedBoards !== initialBoards) {
+    setTrackedBoards(initialBoards);
+    setBoards(initialBoards);
+  }
+
+  const filteredGroups = useMemo(
+    () => filterGroupsByBoard(groups, activeBoard),
+    [groups, activeBoard],
+  );
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
@@ -82,6 +112,16 @@ export function BoardClient({ initial }: BoardClientProps) {
     }
     return null;
   }, [activeId, groups]);
+
+  const defaultBoardId =
+    activeBoard !== "tots"
+      ? activeBoard
+      : boards[0]?.id;
+
+  function handleBoardCreated(board: BoardView) {
+    setBoards((prev) => [...prev, board]);
+    setActiveBoard(board.id);
+  }
 
   function handleDragStart(event: DragStartEvent) {
     setActiveId(String(event.active.id));
@@ -169,23 +209,91 @@ export function BoardClient({ initial }: BoardClientProps) {
   }
 
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCorners}
-      onDragStart={handleDragStart}
-      onDragOver={handleDragOver}
-      onDragEnd={handleDragEnd}
-      onDragCancel={() => setActiveId(null)}
-    >
-      <div className="grid h-[calc(100vh-12rem)] gap-4 md:grid-cols-3">
-        {TASK_STATUSES.map((status) => (
-          <Column key={status} status={status} tasks={groups[status]} />
+    <div className="space-y-5">
+      <nav
+        aria-label="Filtra per espai de treball"
+        className="flex flex-wrap items-center gap-2"
+      >
+        <BoardPill
+          active={activeBoard === "tots"}
+          onClick={() => setActiveBoard("tots")}
+          label="Tots"
+        />
+        {boards.map((board) => (
+          <BoardPill
+            key={board.id}
+            active={activeBoard === board.id}
+            onClick={() => setActiveBoard(board.id)}
+            label={board.name}
+          />
         ))}
-      </div>
+        <button
+          type="button"
+          onClick={() => setCreateBoardOpen(true)}
+          aria-label="Afegir tauler"
+          className="flex h-8 w-8 items-center justify-center rounded-full border border-dashed border-[var(--color-border)] text-[var(--color-text-muted)] transition-all duration-200 hover:border-[var(--color-accent-ring)] hover:bg-[var(--color-surface)] hover:text-[var(--color-accent)] cursor-pointer"
+        >
+          <Plus className="h-3.5 w-3.5" aria-hidden />
+        </button>
+      </nav>
 
-      <DragOverlay>
-        {activeTask ? <TaskCard task={activeTask} isOverlay /> : null}
-      </DragOverlay>
-    </DndContext>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCorners}
+        onDragStart={handleDragStart}
+        onDragOver={handleDragOver}
+        onDragEnd={handleDragEnd}
+        onDragCancel={() => setActiveId(null)}
+      >
+        <div className="grid h-[calc(100vh-14rem)] gap-4 md:grid-cols-3">
+          {TASK_STATUSES.map((status) => (
+            <Column
+              key={status}
+              status={status}
+              tasks={filteredGroups[status]}
+              boards={boards}
+              defaultBoardId={defaultBoardId}
+            />
+          ))}
+        </div>
+
+        <DragOverlay>
+          {activeTask ? (
+            <TaskCard task={activeTask} boards={boards} isOverlay />
+          ) : null}
+        </DragOverlay>
+      </DndContext>
+
+      <BoardFormDialog
+        open={createBoardOpen}
+        onClose={() => setCreateBoardOpen(false)}
+        onCreated={handleBoardCreated}
+      />
+    </div>
+  );
+}
+
+function BoardPill({
+  active,
+  onClick,
+  label,
+}: {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "rounded-full px-3.5 py-1.5 text-xs font-semibold tracking-wide transition-all duration-200 cursor-pointer",
+        active
+          ? "bg-[var(--color-accent)] text-white shadow-[0_0_12px_var(--color-accent-ring)]"
+          : "border border-[var(--color-border)] text-[var(--color-text-muted)] hover:border-[var(--color-border-strong)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface)]",
+      )}
+    >
+      {label}
+    </button>
   );
 }

@@ -11,13 +11,15 @@ import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 import { TASK_STATUS_LABELS } from "@/lib/types";
 import type { TaskStatus } from "@/lib/types";
-import type { BoardTask } from "./types";
+import type { BoardTask, BoardView } from "./types";
 import { TaskCard } from "./TaskCard";
 import { TaskFormDialog } from "./TaskFormDialog";
 
 interface ColumnProps {
   status: TaskStatus;
   tasks: BoardTask[];
+  boards: BoardView[];
+  defaultBoardId?: string;
 }
 
 const accentByStatus: Record<TaskStatus, string> = {
@@ -26,7 +28,7 @@ const accentByStatus: Record<TaskStatus, string> = {
   done: "bg-[var(--color-accent)]",
 };
 
-export function Column({ status, tasks }: ColumnProps) {
+export function Column({ status, tasks, boards, defaultBoardId }: ColumnProps) {
   const { setNodeRef, isOver } = useDroppable({
     id: `column-${status}`,
     data: { type: "column", status },
@@ -72,7 +74,7 @@ export function Column({ status, tasks }: ColumnProps) {
           strategy={verticalListSortingStrategy}
         >
           {tasks.map((task) => (
-            <TaskCard key={task.id} task={task} />
+            <TaskCard key={task.id} task={task} boards={boards} />
           ))}
         </SortableContext>
 
@@ -101,6 +103,8 @@ export function Column({ status, tasks }: ColumnProps) {
         open={createOpen}
         onClose={() => setCreateOpen(false)}
         initialStatus={status}
+        boards={boards}
+        initialBoardId={defaultBoardId}
       />
     </section>
   );
