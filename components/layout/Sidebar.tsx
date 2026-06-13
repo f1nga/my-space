@@ -16,20 +16,23 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { LanguageSelector } from "@/components/ui/LanguageSelector";
+import { useI18n } from "@/lib/i18n/client";
+import type { TranslationKey } from "@/lib/i18n/types";
 import { useSidebar } from "./SidebarProvider";
 
 type NavItem = {
   href: string;
-  label: string;
+  labelKey: TranslationKey;
   icon: typeof LayoutDashboard;
 };
 
 const NAV: NavItem[] = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/board", label: "Tasques", icon: ClipboardList },
-  { href: "/calendar", label: "Calendari", icon: CalendarDays },
-  { href: "/notes", label: "Notes", icon: SquarePen },
-  { href: "/objectius", label: "Objectius", icon: Target },
+  { href: "/", labelKey: "nav.dashboard", icon: LayoutDashboard },
+  { href: "/board", labelKey: "nav.tasks", icon: ClipboardList },
+  { href: "/calendar", labelKey: "nav.calendar", icon: CalendarDays },
+  { href: "/notes", labelKey: "nav.notes", icon: SquarePen },
+  { href: "/objectius", labelKey: "nav.objectives", icon: Target },
 ];
 
 function SidebarSeparator() {
@@ -57,8 +60,11 @@ function SidebarToggle({
   onExpand: () => void;
   onCloseMobile: () => void;
 }) {
-  const collapseLabel = isMobile ? "Tancar menú" : "Replegar barra lateral";
-  const expandLabel = "Expandir barra lateral";
+  const { t } = useI18n();
+  const collapseLabel = isMobile
+    ? t("nav.closeMenu")
+    : t("nav.collapseSidebar");
+  const expandLabel = t("nav.expandSidebar");
 
   function handleClick() {
     if (isMobile) {
@@ -103,6 +109,8 @@ function NavLinks({
   showLabels: boolean;
   onNavigate?: () => void;
 }) {
+  const { t } = useI18n();
+
   return (
     <>
       {NAV.map((item) => {
@@ -111,13 +119,14 @@ function NavLinks({
             ? pathname === "/"
             : pathname === item.href || pathname.startsWith(`${item.href}/`);
         const Icon = item.icon;
+        const label = t(item.labelKey);
         return (
           <Link
             key={item.href}
             href={item.href}
             onClick={onNavigate}
             aria-current={isActive ? "page" : undefined}
-            title={showLabels ? undefined : item.label}
+            title={showLabels ? undefined : label}
             className={cn(
               "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
               showLabels ? "justify-start" : "justify-center",
@@ -134,7 +143,7 @@ function NavLinks({
               aria-hidden
             />
             {showLabels ? (
-              <span className="truncate">{item.label}</span>
+              <span className="truncate">{label}</span>
             ) : null}
           </Link>
         );
@@ -145,6 +154,7 @@ function NavLinks({
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { t } = useI18n();
   const {
     collapsed,
     mobileOpen,
@@ -162,14 +172,14 @@ export function Sidebar() {
       {isMobile && mobileOpen ? (
         <button
           type="button"
-          aria-label="Tancar menú"
+          aria-label={t("nav.closeMenu")}
           className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
           onClick={closeMobile}
         />
       ) : null}
 
       <aside
-        aria-label="Navegació principal"
+        aria-label={t("nav.mainNav")}
         aria-expanded={expanded}
         className={cn(
           "fixed inset-y-0 left-0 z-50 flex flex-col border-r border-border bg-sidebar transition-[width] duration-300 ease-in-out",
@@ -194,7 +204,7 @@ export function Sidebar() {
             </span>
             {showLabels ? (
               <span className="truncate text-base font-semibold tracking-tight">
-                My Space
+                {t("nav.brand")}
               </span>
             ) : null}
           </div>
@@ -228,19 +238,24 @@ export function Sidebar() {
         <div className={cn("shrink-0 p-2", showLabels && "p-3")}>
           <div
             className={cn(
-              "flex items-center",
-              showLabels ? "justify-between gap-2" : "justify-center",
+              "flex flex-col gap-2",
+              showLabels ? "items-stretch" : "items-center",
             )}
           >
             {showLabels ? (
-              <div className="min-w-0 text-xs text-text-subtle">
-                <p className="truncate font-medium text-text-muted">
-                  My Space
-                </p>
-                <p className="truncate">Productivitat personal</p>
+              <div className="flex items-center justify-between gap-2">
+                <div className="min-w-0 text-xs text-text-subtle">
+                  <p className="truncate font-medium text-text-muted">
+                    {t("nav.brand")}
+                  </p>
+                  <p className="truncate">{t("common.brandSubtitle")}</p>
+                </div>
+                <ThemeToggle />
               </div>
-            ) : null}
-            <ThemeToggle />
+            ) : (
+              <ThemeToggle />
+            )}
+            <LanguageSelector compact={!showLabels} />
           </div>
         </div>
       </aside>

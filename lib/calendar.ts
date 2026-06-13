@@ -17,6 +17,7 @@ import {
   subMonths,
   subWeeks,
 } from "date-fns";
+import type { Locale as DateFnsLocale } from "date-fns";
 import { ca } from "date-fns/locale";
 
 export type CalendarView = "month" | "week" | "day";
@@ -25,7 +26,9 @@ export const HOUR_HEIGHT_PX = 48;
 export const MIN_EVENT_HEIGHT_PX = 24;
 export const MINUTES_PER_DAY = 24 * 60;
 
-const WEEK_OPTS = { weekStartsOn: 1 as const, locale: ca };
+function weekOpts(locale: DateFnsLocale = ca) {
+  return { weekStartsOn: 1 as const, locale };
+}
 
 export function parseDateParam(raw: string | undefined): Date {
   if (!raw) return startOfDay(new Date());
@@ -43,15 +46,17 @@ export function toISODate(date: Date): string {
   return format(date, "yyyy-MM-dd");
 }
 
-export function getMonthRange(date: Date) {
-  const start = startOfWeek(startOfMonth(date), WEEK_OPTS);
-  const end = endOfWeek(endOfMonth(date), WEEK_OPTS);
+export function getMonthRange(date: Date, locale: DateFnsLocale = ca) {
+  const opts = weekOpts(locale);
+  const start = startOfWeek(startOfMonth(date), opts);
+  const end = endOfWeek(endOfMonth(date), opts);
   return { start, end };
 }
 
-export function getWeekRange(date: Date) {
-  const start = startOfWeek(date, WEEK_OPTS);
-  const end = endOfWeek(date, WEEK_OPTS);
+export function getWeekRange(date: Date, locale: DateFnsLocale = ca) {
+  const opts = weekOpts(locale);
+  const start = startOfWeek(date, opts);
+  const end = endOfWeek(date, opts);
   return { start, end };
 }
 
@@ -67,8 +72,8 @@ export function getRangeForView(date: Date, view: CalendarView) {
   return getDayRange(date);
 }
 
-export function buildMonthGrid(date: Date): Date[] {
-  const { start, end } = getMonthRange(date);
+export function buildMonthGrid(date: Date, locale: DateFnsLocale = ca): Date[] {
+  const { start, end } = getMonthRange(date, locale);
   const days: Date[] = [];
   let cursor = start;
   while (cursor <= end) {
@@ -78,15 +83,15 @@ export function buildMonthGrid(date: Date): Date[] {
   return days;
 }
 
-export function buildWeekGrid(date: Date): Date[] {
-  const { start } = getWeekRange(date);
+export function buildWeekGrid(date: Date, locale: DateFnsLocale = ca): Date[] {
+  const { start } = getWeekRange(date, locale);
   return Array.from({ length: 7 }, (_, index) => addDays(start, index));
 }
 
-export function weekdayHeaders(): string[] {
-  const start = startOfWeek(new Date(), WEEK_OPTS);
+export function weekdayHeaders(locale: DateFnsLocale = ca): string[] {
+  const start = startOfWeek(new Date(), weekOpts(locale));
   return Array.from({ length: 7 }, (_, index) =>
-    format(addDays(start, index), "EEE", { locale: ca }),
+    format(addDays(start, index), "EEE", { locale }),
   );
 }
 
@@ -102,19 +107,23 @@ export function nextDate(date: Date, view: CalendarView): Date {
   return addDays(date, 1);
 }
 
-export function formatRangeTitle(date: Date, view: CalendarView): string {
+export function formatRangeTitle(
+  date: Date,
+  view: CalendarView,
+  locale: DateFnsLocale = ca,
+): string {
   if (view === "month") {
-    return format(date, "LLLL yyyy", { locale: ca }).replace(/^./, (c) =>
+    return format(date, "LLLL yyyy", { locale }).replace(/^./, (c) =>
       c.toUpperCase(),
     );
   }
   if (view === "day") {
-    return format(date, "EEEE d MMMM yyyy", { locale: ca }).replace(/^./, (c) =>
+    return format(date, "EEEE d MMMM yyyy", { locale }).replace(/^./, (c) =>
       c.toUpperCase(),
     );
   }
-  const { start, end } = getWeekRange(date);
-  return `${format(start, "d MMM", { locale: ca })} – ${format(end, "d MMM yyyy", { locale: ca })}`;
+  const { start, end } = getWeekRange(date, locale);
+  return `${format(start, "d MMM", { locale })} – ${format(end, "d MMM yyyy", { locale })}`;
 }
 
 export function dayKey(date: Date): string {

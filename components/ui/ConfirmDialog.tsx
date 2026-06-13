@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { AlertTriangle, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n/client";
 
 export interface ConfirmDialogProps {
   open: boolean;
@@ -21,13 +22,17 @@ export function ConfirmDialog({
   open,
   onClose,
   onConfirm,
-  title = "Confirmar eliminació",
+  title,
   description,
-  confirmLabel = "Eliminar",
-  cancelLabel = "Cancel·lar",
+  confirmLabel,
+  cancelLabel,
   pending = false,
 }: ConfirmDialogProps) {
+  const { t } = useI18n();
   const confirmRef = useRef<HTMLButtonElement>(null);
+  const resolvedTitle = title ?? t("confirm.deleteTitle");
+  const resolvedConfirmLabel = confirmLabel ?? t("common.delete");
+  const resolvedCancelLabel = cancelLabel ?? t("common.cancel");
 
   useEffect(() => {
     if (!open) return;
@@ -61,7 +66,7 @@ export function ConfirmDialog({
       <button
         type="button"
         tabIndex={-1}
-        aria-label="Tancar dialeg"
+        aria-label={t("confirm.closeDialog")}
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={() => {
           if (!pending) onClose();
@@ -86,7 +91,7 @@ export function ConfirmDialog({
                 id="confirm-dialog-title"
                 className="text-base font-semibold tracking-tight text-text"
               >
-                {title}
+                {resolvedTitle}
               </h2>
               <p
                 id="confirm-dialog-desc"
@@ -100,7 +105,7 @@ export function ConfirmDialog({
             type="button"
             onClick={onClose}
             disabled={pending}
-            aria-label="Tancar"
+            aria-label={t("common.close")}
             className="rounded-md p-1.5 text-text-muted transition-colors hover:bg-surface hover:text-text disabled:opacity-50"
           >
             <X className="h-4 w-4" aria-hidden />
@@ -115,7 +120,7 @@ export function ConfirmDialog({
             onClick={onClose}
             disabled={pending}
           >
-            {cancelLabel}
+            {resolvedCancelLabel}
           </Button>
           <Button
             ref={confirmRef}
@@ -125,7 +130,7 @@ export function ConfirmDialog({
             disabled={pending}
             className="bg-danger text-white hover:bg-danger/90 focus-visible:outline-danger"
           >
-            {pending ? "Eliminant…" : confirmLabel}
+            {pending ? t("common.deleting") : resolvedConfirmLabel}
           </Button>
         </footer>
       </div>
