@@ -13,14 +13,11 @@ import { ConfirmDialogHost } from "@/components/ui/ConfirmDialog";
 import { useConfirmDialog } from "@/components/ui/useConfirmDialog";
 import {
   CATEGORIA_STYLES,
-  timeLabel,
   timelineProgress,
 } from "@/lib/objectius";
-import {
-  CATEGORIA_OBJECTIU_LABELS,
-  ESTAT_OBJECTIU_LABELS,
-} from "@/lib/types";
-import { cn, formatDateCa } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n/client";
+import { getTimeLabel } from "@/lib/i18n/helpers";
+import { cn } from "@/lib/utils";
 import type { ObjectiuView } from "./types";
 
 interface ObjectiuCardProps {
@@ -30,6 +27,7 @@ interface ObjectiuCardProps {
 }
 
 export function ObjectiuCard({ objectiu, onEdit, onOpen }: ObjectiuCardProps) {
+  const { t, intlLocale } = useI18n();
   const [menuOpen, setMenuOpen] = useState(false);
   const { confirm, dialogProps } = useConfirmDialog();
   const styles = CATEGORIA_STYLES[objectiu.categoria];
@@ -79,7 +77,7 @@ export function ObjectiuCard({ objectiu, onEdit, onOpen }: ObjectiuCardProps) {
                 styles.badge,
               )}
             >
-              {CATEGORIA_OBJECTIU_LABELS[objectiu.categoria]}
+              {t(`category.${objectiu.categoria}`)}
             </span>
             <h3 className="text-base font-semibold tracking-tight text-[var(--color-text)] transition-colors group-hover:text-[var(--color-accent)]">
               {objectiu.titol}
@@ -118,7 +116,7 @@ export function ObjectiuCard({ objectiu, onEdit, onOpen }: ObjectiuCardProps) {
                   }}
                 >
                   <Pencil className="h-3.5 w-3.5" aria-hidden />
-                  Editar
+                  {t("common.edit")}
                 </button>
                 <button
                   type="button"
@@ -134,7 +132,7 @@ export function ObjectiuCard({ objectiu, onEdit, onOpen }: ObjectiuCardProps) {
                   }}
                 >
                   <Trash2 className="h-3.5 w-3.5" aria-hidden />
-                  Eliminar
+                  {t("common.delete")}
                 </button>
               </div>
             ) : null}
@@ -144,7 +142,7 @@ export function ObjectiuCard({ objectiu, onEdit, onOpen }: ObjectiuCardProps) {
         <div className="space-y-2">
           <div className="flex items-center justify-between text-xs">
             <span className="font-medium text-[var(--color-text-muted)]">
-              Progrés
+              {t("objectives.progress")}
             </span>
             <span className="font-semibold text-[var(--color-text)]">
               {objectiu.progress}%
@@ -177,10 +175,14 @@ export function ObjectiuCard({ objectiu, onEdit, onOpen }: ObjectiuCardProps) {
 
         <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[var(--color-border)]/60 pt-3 text-xs">
           <span className="text-[var(--color-text-muted)]">
-            {timeLabel(new Date(objectiu.dataFinal), objectiu.estat)}
+            {getTimeLabel(
+              t,
+              new Date(objectiu.dataFinal),
+              objectiu.estat,
+            )}
           </span>
           <span className="text-[var(--color-text-subtle)]">
-            {ESTAT_OBJECTIU_LABELS[objectiu.estat]}
+            {t(`objectiveStatus.${objectiu.estat}`)}
           </span>
         </div>
 
@@ -194,18 +196,18 @@ export function ObjectiuCard({ objectiu, onEdit, onOpen }: ObjectiuCardProps) {
           <div className="flex gap-2 pt-1">
             <span className="inline-flex items-center gap-1 rounded-lg bg-[var(--color-accent-soft)] px-3 py-1.5 text-xs font-medium text-[var(--color-accent)]">
               <CheckCircle2 className="h-3.5 w-3.5" aria-hidden />
-              Fet!
+              {t("taskStatus.done")}!
             </span>
           </div>
         ) : null}
 
         <p className="text-[10px] text-[var(--color-text-subtle)]">
-          {formatDateCa(new Date(objectiu.dataInici), {
+          {new Date(objectiu.dataInici).toLocaleDateString(intlLocale, {
             day: "numeric",
             month: "short",
           })}{" "}
           —{" "}
-          {formatDateCa(new Date(objectiu.dataFinal), {
+          {new Date(objectiu.dataFinal).toLocaleDateString(intlLocale, {
             day: "numeric",
             month: "short",
             year: "numeric",

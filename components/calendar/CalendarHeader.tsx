@@ -11,6 +11,8 @@ import {
   toISODate,
   type CalendarView,
 } from "@/lib/calendar";
+import { useI18n } from "@/lib/i18n/client";
+import type { TranslationKey } from "@/lib/i18n/types";
 import { cn } from "@/lib/utils";
 import { EventFormDialog } from "./EventFormDialog";
 
@@ -19,10 +21,10 @@ interface CalendarHeaderProps {
   view: CalendarView;
 }
 
-const VIEW_OPTIONS: { value: CalendarView; label: string }[] = [
-  { value: "month", label: "Mes" },
-  { value: "week", label: "Setmana" },
-  { value: "day", label: "Dia" },
+const VIEW_OPTIONS: { value: CalendarView; labelKey: TranslationKey }[] = [
+  { value: "month", labelKey: "calendar.viewMonth" },
+  { value: "week", labelKey: "calendar.viewWeek" },
+  { value: "day", labelKey: "calendar.viewDay" },
 ];
 
 function buildHref(date: Date, view: CalendarView): string {
@@ -33,8 +35,9 @@ function buildHref(date: Date, view: CalendarView): string {
 }
 
 export function CalendarHeader({ date, view }: CalendarHeaderProps) {
+  const { t, dateFnsLocale } = useI18n();
   const [createOpen, setCreateOpen] = useState(false);
-  const title = formatRangeTitle(date, view);
+  const title = formatRangeTitle(date, view, dateFnsLocale);
 
   return (
     <>
@@ -42,7 +45,7 @@ export function CalendarHeader({ date, view }: CalendarHeaderProps) {
         <div className="flex items-center gap-1">
           <Link
             href={buildHref(previousDate(date, view), view)}
-            aria-label="Anterior"
+            aria-label={t("calendar.previous")}
             className="grid h-9 w-9 place-items-center rounded-lg border border-border bg-surface text-text-muted transition-colors hover:bg-surface-hover hover:text-text"
           >
             <ChevronLeft className="h-4 w-4" aria-hidden />
@@ -51,11 +54,11 @@ export function CalendarHeader({ date, view }: CalendarHeaderProps) {
             href={buildHref(new Date(), view)}
             className="rounded-lg border border-border bg-surface px-3 py-2 text-xs font-medium text-text-muted transition-colors hover:bg-surface-hover hover:text-text"
           >
-            Avui
+            {t("calendar.today")}
           </Link>
           <Link
             href={buildHref(nextDate(date, view), view)}
-            aria-label="Seguent"
+            aria-label={t("calendar.next")}
             className="grid h-9 w-9 place-items-center rounded-lg border border-border bg-surface text-text-muted transition-colors hover:bg-surface-hover hover:text-text"
           >
             <ChevronRight className="h-4 w-4" aria-hidden />
@@ -70,9 +73,9 @@ export function CalendarHeader({ date, view }: CalendarHeaderProps) {
           <div
             className="inline-flex rounded-lg border border-border bg-surface p-0.5"
             role="group"
-            aria-label="Vista del calendari"
+            aria-label={t("calendar.viewLabel")}
           >
-            {VIEW_OPTIONS.map(({ value, label }) => {
+            {VIEW_OPTIONS.map(({ value, labelKey }) => {
               const isActive = view === value;
               return (
                 <Link
@@ -86,13 +89,13 @@ export function CalendarHeader({ date, view }: CalendarHeaderProps) {
                       : "text-text-muted hover:text-text",
                   )}
                 >
-                  {label}
+                  {t(labelKey)}
                 </Link>
               );
             })}
           </div>
           <Button size="sm" onClick={() => setCreateOpen(true)}>
-            <Plus className="h-3.5 w-3.5" aria-hidden /> Nou
+            <Plus className="h-3.5 w-3.5" aria-hidden /> {t("common.new")}
           </Button>
         </div>
       </div>

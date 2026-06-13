@@ -5,7 +5,8 @@ import { Dialog } from "@/components/ui/Dialog";
 import { Button } from "@/components/ui/Button";
 import { Input, Select, Textarea } from "@/components/ui/Field";
 import { createTask, updateTask } from "@/lib/actions/tasks";
-import { TASK_STATUS_LABELS, TASK_STATUSES } from "@/lib/types";
+import { useI18n } from "@/lib/i18n/client";
+import { TASK_STATUSES } from "@/lib/types";
 import type { TaskStatus } from "@/lib/types";
 import type { BoardTask, BoardView } from "./types";
 
@@ -32,6 +33,7 @@ export function TaskFormDialog({
   initialStatus,
   initialBoardId,
 }: TaskFormDialogProps) {
+  const { t } = useI18n();
   const editing = Boolean(task);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -59,11 +61,11 @@ export function TaskFormDialog({
     };
 
     if (!payload.title) {
-      setError("Cal un titol per a la tasca.");
+      setError(t("board.titleRequired"));
       return;
     }
     if (!payload.boardId) {
-      setError("Cal seleccionar un tauler.");
+      setError(t("board.boardRequired"));
       return;
     }
 
@@ -84,11 +86,9 @@ export function TaskFormDialog({
     <Dialog
       open={open}
       onClose={onClose}
-      title={editing ? "Editar tasca" : "Nova tasca"}
+      title={editing ? t("board.editTaskTitle") : t("board.newTaskTitle")}
       description={
-        editing
-          ? "Actualitza els camps de la tasca seleccionada."
-          : "Afegeix-la a la columna que prefereixis."
+        editing ? t("board.editTaskDescription") : t("board.newTaskDescription")
       }
     >
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -97,7 +97,7 @@ export function TaskFormDialog({
             htmlFor="task-title"
             className="text-xs font-medium text-[var(--color-text-muted)]"
           >
-            Titol
+            {t("common.title")}
           </label>
           <Input
             id="task-title"
@@ -107,7 +107,7 @@ export function TaskFormDialog({
             autoFocus
             required
             maxLength={200}
-            placeholder="Per exemple, revisar correus"
+            placeholder={t("board.titlePlaceholder")}
           />
         </div>
 
@@ -116,7 +116,7 @@ export function TaskFormDialog({
             htmlFor="task-description"
             className="text-xs font-medium text-[var(--color-text-muted)]"
           >
-            Descripcio (opcional)
+            {t("board.descriptionOptional")}
           </label>
           <Textarea
             id="task-description"
@@ -125,7 +125,7 @@ export function TaskFormDialog({
             rows={3}
             maxLength={2000}
             className="resize-none"
-            placeholder="Notes addicionals"
+            placeholder={t("board.descriptionPlaceholder")}
           />
         </div>
 
@@ -135,7 +135,7 @@ export function TaskFormDialog({
               htmlFor="task-status"
               className="text-xs font-medium text-[var(--color-text-muted)]"
             >
-              Estat
+              {t("board.status")}
             </label>
             <Select
               id="task-status"
@@ -144,7 +144,7 @@ export function TaskFormDialog({
             >
               {TASK_STATUSES.map((value) => (
                 <option key={value} value={value}>
-                  {TASK_STATUS_LABELS[value]}
+                  {t(`taskStatus.${value}`)}
                 </option>
               ))}
             </Select>
@@ -154,7 +154,7 @@ export function TaskFormDialog({
               htmlFor="task-board"
               className="text-xs font-medium text-[var(--color-text-muted)]"
             >
-              Tauler
+              {t("board.board")}
             </label>
             <Select
               id="task-board"
@@ -175,7 +175,7 @@ export function TaskFormDialog({
             htmlFor="task-due"
             className="text-xs font-medium text-[var(--color-text-muted)]"
           >
-            Venciment (opcional)
+            {t("board.dueOptional")}
           </label>
           <Input
             id="task-due"
@@ -202,10 +202,14 @@ export function TaskFormDialog({
             onClick={onClose}
             disabled={pending}
           >
-            Cancel·lar
+            {t("common.cancel")}
           </Button>
           <Button type="submit" size="sm" disabled={pending}>
-            {pending ? "Desant…" : editing ? "Desar canvis" : "Crear tasca"}
+            {pending
+              ? t("common.saving")
+              : editing
+                ? t("common.saveChanges")
+                : t("board.createTask")}
           </Button>
         </footer>
       </form>

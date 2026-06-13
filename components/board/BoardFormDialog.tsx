@@ -5,6 +5,7 @@ import { Dialog } from "@/components/ui/Dialog";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Field";
 import { createBoard } from "@/lib/actions/boards";
+import { useI18n } from "@/lib/i18n/client";
 
 interface BoardFormDialogProps {
   open: boolean;
@@ -17,6 +18,7 @@ export function BoardFormDialog({
   onClose,
   onCreated,
 }: BoardFormDialogProps) {
+  const { t } = useI18n();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [name, setName] = useState("");
@@ -33,7 +35,7 @@ export function BoardFormDialog({
 
     const trimmed = name.trim();
     if (!trimmed) {
-      setError("Cal un nom per al tauler.");
+      setError(t("board.boardNameRequired"));
       return;
     }
 
@@ -52,8 +54,8 @@ export function BoardFormDialog({
     <Dialog
       open={open}
       onClose={handleClose}
-      title="Nou tauler"
-      description="Crea un espai de treball amb el nom que vulguis."
+      title={t("board.newBoardTitle")}
+      description={t("board.newBoardDescription")}
       size="sm"
     >
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -62,7 +64,7 @@ export function BoardFormDialog({
             htmlFor="board-name"
             className="text-xs font-medium text-[var(--color-text-muted)]"
           >
-            Nom del tauler
+            {t("board.boardName")}
           </label>
           <Input
             id="board-name"
@@ -72,7 +74,7 @@ export function BoardFormDialog({
             autoFocus
             required
             maxLength={50}
-            placeholder="Per exemple, Feina, Uni, Projectes…"
+            placeholder={t("board.boardNamePlaceholder")}
           />
         </div>
 
@@ -93,10 +95,10 @@ export function BoardFormDialog({
             onClick={handleClose}
             disabled={pending}
           >
-            Cancel·lar
+            {t("common.cancel")}
           </Button>
           <Button type="submit" size="sm" disabled={pending}>
-            {pending ? "Creant…" : "Crear tauler"}
+            {pending ? t("common.creating") : t("board.createBoard")}
           </Button>
         </footer>
       </form>

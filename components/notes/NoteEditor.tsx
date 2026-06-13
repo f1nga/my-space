@@ -8,6 +8,7 @@ import { Input, Textarea } from "@/components/ui/Field";
 import { ConfirmDialogHost } from "@/components/ui/ConfirmDialog";
 import { useConfirmDialog } from "@/components/ui/useConfirmDialog";
 import { deleteNote, updateNote } from "@/lib/actions/notes";
+import { useI18n } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
 import type { NoteDetail } from "./types";
 
@@ -21,6 +22,7 @@ type SaveStatus = "idle" | "saving" | "saved" | "error";
 const DEBOUNCE_MS = 800;
 
 export function NoteEditor({ note }: NoteEditorProps) {
+  const { t } = useI18n();
   const router = useRouter();
   const [title, setTitle] = useState(note.title);
   const [content, setContent] = useState(note.content);
@@ -52,7 +54,7 @@ export function NoteEditor({ note }: NoteEditorProps) {
       const snapshot = { title, content };
       const result = await updateNote({
         id: note.id,
-        title: snapshot.title.trim() || "Sense titol",
+        title: snapshot.title.trim() || t("notes.defaultTitle"),
         content: snapshot.content,
       });
       if (result.ok) {
@@ -74,9 +76,8 @@ export function NoteEditor({ note }: NoteEditorProps) {
 
   function handleDelete() {
     confirm({
-      title: "Eliminar nota",
-      description:
-        "Vols eliminar aquesta nota? Aquesta acció no es pot desfer.",
+      title: t("confirm.deleteNoteTitle"),
+      description: t("confirm.deleteNoteDescription"),
       onConfirm: async () => {
         const result = await deleteNote(note.id);
         if (result.ok) router.push("/notes");
@@ -94,13 +95,13 @@ export function NoteEditor({ note }: NoteEditorProps) {
             status === "error" && "text-[var(--color-danger)]",
           )}
         >
-          {status === "saving" && "Desant…"}
-          {status === "saved" && "Desat"}
-          {status === "error" && "Error en desar"}
-          {status === "idle" && "Tots els canvis desats"}
+          {status === "saving" && t("common.saving")}
+          {status === "saved" && t("common.saved")}
+          {status === "error" && t("common.saveError")}
+          {status === "idle" && t("common.allChangesSaved")}
         </span>
         <Button variant="danger" size="sm" onClick={handleDelete}>
-          <Trash2 className="h-3.5 w-3.5" aria-hidden /> Eliminar
+          <Trash2 className="h-3.5 w-3.5" aria-hidden /> {t("common.delete")}
         </Button>
       </header>
       <div className="flex flex-1 flex-col gap-2 px-6 py-6">
@@ -110,16 +111,16 @@ export function NoteEditor({ note }: NoteEditorProps) {
           value={title}
           onChange={(event) => setTitle(event.target.value)}
           maxLength={200}
-          placeholder="Titol"
-          aria-label="Titol de la nota"
+          placeholder={t("notes.titlePlaceholder")}
+          aria-label={t("notes.titleAria")}
           className="text-2xl font-semibold tracking-tight text-text placeholder:text-text-subtle"
         />
         <Textarea
           ghost
           value={content}
           onChange={(event) => setContent(event.target.value)}
-          placeholder="Comença a escriure…"
-          aria-label="Contingut de la nota"
+          placeholder={t("notes.contentPlaceholder")}
+          aria-label={t("notes.contentAria")}
           className="flex-1 resize-none text-sm leading-relaxed text-text-muted placeholder:text-text-subtle"
         />
       </div>

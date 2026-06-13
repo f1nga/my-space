@@ -5,9 +5,11 @@ import { Dialog } from "@/components/ui/Dialog";
 import { Button } from "@/components/ui/Button";
 import { Input, Textarea, formCheckClass } from "@/components/ui/Field";
 import { createEvent, updateEvent } from "@/lib/actions/events";
+import { useI18n } from "@/lib/i18n/client";
+import type { TranslationKey } from "@/lib/i18n/types";
 import { EVENT_COLORS, type EventColor } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import { COLOR_LABELS, EVENT_COLOR_CLASSES } from "./eventColors";
+import { EVENT_COLOR_CLASSES } from "./eventColors";
 import type { EventSnapshot } from "./types";
 
 interface EventFormDialogProps {
@@ -40,6 +42,7 @@ function EventFormContent({
   defaultStart?: Date;
   onClose: () => void;
 }) {
+  const { t } = useI18n();
   const editing = Boolean(event);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -62,11 +65,11 @@ function EventFormContent({
     setError(null);
 
     if (!title.trim()) {
-      setError("Cal un titol per a l'esdeveniment.");
+      setError(t("calendar.eventTitleRequired"));
       return;
     }
     if (!startsAt) {
-      setError("Cal una data d'inici.");
+      setError(t("calendar.startRequired"));
       return;
     }
 
@@ -98,7 +101,7 @@ function EventFormContent({
           htmlFor="event-title"
           className="text-xs font-medium text-text-muted"
         >
-          Titol
+          {t("common.title")}
         </label>
         <Input
           id="event-title"
@@ -116,7 +119,7 @@ function EventFormContent({
           htmlFor="event-description"
           className="text-xs font-medium text-text-muted"
         >
-          Descripcio
+          {t("common.description")}
         </label>
         <Textarea
           id="event-description"
@@ -124,7 +127,7 @@ function EventFormContent({
           onChange={(e) => setDescription(e.target.value)}
           rows={3}
           maxLength={5000}
-          placeholder="Opcional"
+          placeholder={t("common.optional")}
           className="resize-y"
         />
       </div>
@@ -139,7 +142,7 @@ function EventFormContent({
             formCheckClass,
           )}
         />
-        Tot el dia
+        {t("common.allDay")}
       </label>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -148,7 +151,7 @@ function EventFormContent({
             htmlFor="event-start"
             className="text-xs font-medium text-text-muted"
           >
-            Inici
+            {t("calendar.start")}
           </label>
           <Input
             id="event-start"
@@ -163,7 +166,7 @@ function EventFormContent({
             htmlFor="event-end"
             className="text-xs font-medium text-text-muted"
           >
-            Final (opcional)
+            {t("calendar.endOptional")}
           </label>
           <Input
             id="event-end"
@@ -176,7 +179,7 @@ function EventFormContent({
 
       <fieldset className="space-y-2">
         <legend className="text-xs font-medium text-text-muted">
-          Color
+          {t("calendar.color")}
         </legend>
         <div className="flex flex-wrap gap-2">
           {EVENT_COLORS.map((value) => (
@@ -185,7 +188,7 @@ function EventFormContent({
               type="button"
               onClick={() => setColor(value)}
               aria-pressed={color === value}
-              aria-label={COLOR_LABELS[value]}
+              aria-label={t(`eventColor.${value}` as TranslationKey)}
               className={cn(
                 "h-7 w-7 rounded-full border transition-transform",
                 EVENT_COLOR_CLASSES[value],
@@ -215,10 +218,14 @@ function EventFormContent({
           onClick={onClose}
           disabled={pending}
         >
-          Cancel·lar
+          {t("common.cancel")}
         </Button>
         <Button type="submit" size="sm" disabled={pending}>
-          {pending ? "Desant…" : editing ? "Desar canvis" : "Crear"}
+          {pending
+            ? t("common.saving")
+            : editing
+              ? t("common.saveChanges")
+              : t("common.create")}
         </Button>
       </footer>
     </form>
@@ -231,17 +238,18 @@ export function EventFormDialog({
   event,
   defaultStart,
 }: EventFormDialogProps) {
+  const { t } = useI18n();
   const editing = Boolean(event);
 
   return (
     <Dialog
       open={open}
       onClose={onClose}
-      title={editing ? "Editar esdeveniment" : "Nou esdeveniment"}
+      title={editing ? t("calendar.editEvent") : t("calendar.newEvent")}
       description={
         editing
-          ? "Modifica els camps i desa els canvis."
-          : "Afegeix-lo al calendari."
+          ? t("calendar.editEventDescription")
+          : t("calendar.newEventDescription")
       }
     >
       <EventFormContent

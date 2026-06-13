@@ -4,16 +4,21 @@ import type { TaskStatus } from "@/lib/types";
 import { TASK_STATUSES } from "@/lib/types";
 
 export type TaskRecord = Awaited<ReturnType<typeof prisma.task.findFirst>>;
+export type TaskWithBoard = Awaited<
+  ReturnType<
+    typeof prisma.task.findMany<{ include: { board: true } }>
+  >
+>[number];
 
 export async function getTasksGroupedByStatus(): Promise<
-  Record<TaskStatus, NonNullable<TaskRecord>[]>
+  Record<TaskStatus, TaskWithBoard[]>
 > {
   const tasks = await prisma.task.findMany({
     include: { board: true },
     orderBy: [{ position: "asc" }, { createdAt: "asc" }],
   });
 
-  const grouped: Record<TaskStatus, NonNullable<TaskRecord>[]> = {
+  const grouped: Record<TaskStatus, TaskWithBoard[]> = {
     todo: [],
     doing: [],
     done: [],

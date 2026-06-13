@@ -24,12 +24,10 @@ import {
   updateObjectiuProgress,
   updateSubObjectiu,
 } from "@/lib/actions/objectius";
-import { CATEGORIA_STYLES, timeLabel } from "@/lib/objectius";
-import {
-  CATEGORIA_OBJECTIU_LABELS,
-  ESTAT_OBJECTIU_LABELS,
-} from "@/lib/types";
-import { cn, formatDateCa } from "@/lib/utils";
+import { CATEGORIA_STYLES } from "@/lib/objectius";
+import { useI18n } from "@/lib/i18n/client";
+import { getTimeLabel } from "@/lib/i18n/helpers";
+import { cn } from "@/lib/utils";
 import type { ObjectiuView } from "./types";
 
 interface ObjectiuDetailDialogProps {
@@ -43,6 +41,7 @@ export function ObjectiuDetailDialog({
   onClose,
   objectiu,
 }: ObjectiuDetailDialogProps) {
+  const { t, intlLocale } = useI18n();
   const [pending, startTransition] = useTransition();
   const [localProgress, setLocalProgress] = useState(0);
   const [showCelebration, setShowCelebration] = useState(false);
@@ -63,10 +62,13 @@ export function ObjectiuDetailDialog({
 
   if (!objectiu) return null;
 
-  const styles = CATEGORIA_STYLES[objectiu.categoria];
-  const isCompleted = objectiu.estat === "COMPLETAT";
-  const hasSubtasques = objectiu.subtasques.length > 0;
-  const progress = hasSubtasques ? objectiu.progress : localProgress || objectiu.progress;
+  const currentObjectiu = objectiu;
+  const styles = CATEGORIA_STYLES[currentObjectiu.categoria];
+  const isCompleted = currentObjectiu.estat === "COMPLETAT";
+  const hasSubtasques = currentObjectiu.subtasques.length > 0;
+  const progress = hasSubtasques
+    ? currentObjectiu.progress
+    : localProgress || currentObjectiu.progress;
 
   function handleComplete() {
     startTransition(async () => {
@@ -86,8 +88,8 @@ export function ObjectiuDetailDialog({
 
   function handleDeleteSub(id: string, titol: string) {
     confirm({
-      title: "Eliminar subtasca",
-      description: `Vols eliminar la subtasca «${titol}»? Aquesta acció no es pot desfer.`,
+      title: t("confirm.deleteSubtaskTitle"),
+      description: t("confirm.deleteSubtaskDescription"),
       onConfirm: async () => {
         setSubError(null);
         if (editingSubId === id) {
@@ -114,7 +116,7 @@ export function ObjectiuDetailDialog({
   function handleSaveEditSub(id: string) {
     const titol = editTitle.trim();
     if (!titol) {
-      setSubError("Cal un títol per a la subtasca.");
+      setSubError(t("objectives.subtaskTitleRequired"));
       return;
     }
     setSubError(null);
@@ -134,17 +136,17 @@ export function ObjectiuDetailDialog({
 
     const titol = newSubtasca.trim();
     if (!titol) {
-      setSubError("Escriu un títol per a la subtasca.");
+      setSubError(t("objectives.subtaskWriteTitle"));
       return;
     }
-    if (objectiu.subtasques.length >= 20) {
-      setSubError("Màxim 20 subtasques per objectiu.");
+    if (currentObjectiu.subtasques.length >= 20) {
+      setSubError(t("objectives.subtaskMax"));
       return;
     }
 
     startTransition(async () => {
       const result = await createSubObjectiu({
-        objectiuId: objectiu.id,
+        objectiuId: currentObjectiu.id,
         titol,
       });
       if (!result.ok) {
@@ -183,20 +185,20 @@ export function ObjectiuDetailDialog({
               styles.badge,
             )}
           >
-            {CATEGORIA_OBJECTIU_LABELS[objectiu.categoria]}
+            {t(`category.${objectiu.categoria}`)}
           </span>
           <span className="text-xs text-[var(--color-text-muted)]">
-            {ESTAT_OBJECTIU_LABELS[objectiu.estat]}
+            {t(`objectiveStatus.${objectiu.estat}`)}
           </span>
           <span className="text-xs text-[var(--color-text-subtle)]">
-            {timeLabel(new Date(objectiu.dataFinal), objectiu.estat)}
+            {getTimeLabel(t, new Date(objectiu.dataFinal), objectiu.estat)}
           </span>
         </div>
 
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
             <span className="font-medium text-[var(--color-text-muted)]">
-              Progrés global
+              {t("objectives.progress")}
             </span>
             <span className="font-semibold text-[var(--color-text)]">
               {progress}%
@@ -214,13 +216,13 @@ export function ObjectiuDetailDialog({
         </div>
 
         <p className="text-xs text-[var(--color-text-subtle)]">
-          {formatDateCa(new Date(objectiu.dataInici), {
+          {new Date(objectiu.dataInici).toLocaleDateString(intlLocale, {
             day: "numeric",
             month: "long",
             year: "numeric",
           })}{" "}
           —{" "}
-          {formatDateCa(new Date(objectiu.dataFinal), {
+          {new Date(objectiu.dataFinal).toLocaleDateString(intlLocale, {
             day: "numeric",
             month: "long",
             year: "numeric",
@@ -229,7 +231,7 @@ export function ObjectiuDetailDialog({
 
         <div className="space-y-3">
           <p className="text-xs font-medium uppercase tracking-wider text-text-subtle">
-            Subtasques
+            {t("objectives.subtasks")}
           </p>
 
           {hasSubtasques ? (
@@ -251,14 +253,14 @@ export function ObjectiuDetailDialog({
                       disabled={pending}
                       maxLength={200}
                       autoFocus
-                      aria-label="Editar títol de la subtasca"
+                      aria-label={t("objectives.editSubtaskTitle")}
                       className="min-w-0 flex-1 rounded-xl border-accent"
                     />
                     <button
                       type="button"
                       disabled={pending}
                       onClick={() => handleSaveEditSub(sub.id)}
-                      aria-label="Desar subtasca"
+                      aria-label={t("objectives.saveSubtask")}
                       className="grid h-10 w-10 shrink-0 cursor-pointer place-items-center rounded-xl border border-border text-accent transition-colors hover:bg-accent-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
                     >
                       <Check className="h-4 w-4" aria-hidden />
@@ -267,7 +269,7 @@ export function ObjectiuDetailDialog({
                       type="button"
                       disabled={pending}
                       onClick={cancelEditSub}
-                      aria-label="Cancel·lar edició"
+                      aria-label={t("objectives.cancelEdit")}
                       className="grid h-10 w-10 shrink-0 cursor-pointer place-items-center rounded-xl border border-border text-text-muted transition-colors hover:bg-surface hover:text-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
                     >
                       <X className="h-4 w-4" aria-hidden />
@@ -333,8 +335,8 @@ export function ObjectiuDetailDialog({
             <div className="space-y-2 rounded-xl border border-dashed border-border bg-surface/50 px-3 py-3">
               <p className="text-xs text-text-muted">
                 {isCompleted
-                  ? "Encara no hi ha subtasques. Si n'afegeixes, l'objectiu tornarà a estar en progrés."
-                  : "Encara no hi ha subtasques. Afegeix-ne per calcular el progrés automàticament, o fes servir el control manual."}
+                  ? t("objectives.noSubtasksCompleted")
+                  : t("objectives.noSubtasks")}
               </p>
               {!isCompleted ? (
                 <>
@@ -342,7 +344,7 @@ export function ObjectiuDetailDialog({
                     htmlFor="detail-progress"
                     className="text-xs font-medium text-text-muted"
                   >
-                    Progrés manual ({progress}%)
+                    {t("objectives.manualProgress")} ({progress}%)
                   </label>
                   <input
                     id="detail-progress"
@@ -376,12 +378,12 @@ export function ObjectiuDetailDialog({
                 onChange={(e) => setNewSubtasca(e.target.value)}
                 maxLength={200}
                 disabled={pending}
-                placeholder="Nova subtasca..."
+                placeholder={t("objectives.newSubtaskPlaceholder")}
                 className="min-w-0 flex-1"
               />
               <Button type="submit" size="sm" disabled={pending}>
                 <Plus className="h-4 w-4" aria-hidden />
-                Afegir
+                {t("common.add")}
               </Button>
             </form>
           ) : null}
@@ -401,12 +403,12 @@ export function ObjectiuDetailDialog({
             onClick={handleComplete}
           >
             <CheckCircle2 className="h-4 w-4" aria-hidden />
-            Marcar com a completat
+            {t("objectives.markCompleted")}
           </Button>
         ) : (
           <div className="flex items-center justify-center gap-2 rounded-xl bg-[var(--color-accent-soft)] px-4 py-3 text-sm font-medium text-[var(--color-accent)]">
             <PartyPopper className="h-4 w-4" aria-hidden />
-            Objectiu assolit!
+            {t("objectives.goalAchieved")}
           </div>
         )}
 
@@ -418,7 +420,7 @@ export function ObjectiuDetailDialog({
             <div className="scale-110 animate-pulse rounded-2xl bg-[var(--color-bg-elevated)] px-8 py-6 text-center shadow-[var(--shadow-pop)]">
               <PartyPopper className="mx-auto h-10 w-10 text-[var(--color-accent)]" />
               <p className="mt-2 text-lg font-semibold text-[var(--color-text)]">
-                Enhorabona!
+                {t("objectives.congratulations")}
               </p>
             </div>
           </div>

@@ -4,12 +4,9 @@ import { Plus, Target } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { useI18n } from "@/lib/i18n/client";
 import type { CategoriaObjectiu, EstatObjectiu } from "@/lib/types";
-import {
-  CATEGORIA_OBJECTIU_LABELS,
-  ESTAT_OBJECTIU_LABELS,
-  ESTATS_OBJECTIU,
-} from "@/lib/types";
+import { CATEGORIES_OBJECTIU, ESTATS_OBJECTIU } from "@/lib/types";
 import { ObjectiuCard } from "./ObjectiuCard";
 import { ObjectiuDetailDialog } from "./ObjectiuDetailDialog";
 import { ObjectiuFormDialog } from "./ObjectiuFormDialog";
@@ -24,6 +21,7 @@ interface ObjectiusClientProps {
 type FilterEstat = "TOTS" | EstatObjectiu;
 
 export function ObjectiusClient({ initial, stats }: ObjectiusClientProps) {
+  const { t } = useI18n();
   const [objectius, setObjectius] = useState(initial);
   const [trackedInitial, setTrackedInitial] = useState(initial);
   const [filterEstat, setFilterEstat] = useState<FilterEstat>("TOTS");
@@ -86,14 +84,14 @@ export function ObjectiusClient({ initial, stats }: ObjectiusClientProps) {
               }
             >
               {estat === "TOTS"
-                ? "Tots"
-                : ESTAT_OBJECTIU_LABELS[estat as EstatObjectiu]}
+                ? t("objectiveStatus.TOTS")
+                : t(`objectiveStatus.${estat}` as `objectiveStatus.${EstatObjectiu}`)}
             </button>
           ))}
         </div>
         <Button size="sm" onClick={openCreate} className="cursor-pointer">
           <Plus className="h-4 w-4" aria-hidden />
-          Afegir objectiu
+          {t("objectives.addObjective")}
         </Button>
       </div>
 
@@ -107,35 +105,33 @@ export function ObjectiusClient({ initial, stats }: ObjectiusClientProps) {
               : "rounded-lg cursor-pointer px-2.5 py-1 text-xs text-text-muted hover:bg-surface"
           }
         >
-          Totes
+          {t("common.allFeminine")}
         </button>
-        {(Object.keys(CATEGORIA_OBJECTIU_LABELS) as CategoriaObjectiu[]).map(
-          (cat) => (
-            <button
-              key={cat}
-              type="button"
-              onClick={() => setFilterCategoria(cat)}
-              className={
-                filterCategoria === cat
-                  ? "rounded-lg cursor-pointer bg-surface px-2.5 py-1 text-xs font-medium text-text"
-                  : "rounded-lg cursor-pointer px-2.5 py-1 text-xs text-text-muted hover:bg-surface"
-              }
-            >
-              {CATEGORIA_OBJECTIU_LABELS[cat]}
-            </button>
-          ),
-        )}
+        {CATEGORIES_OBJECTIU.map((cat) => (
+          <button
+            key={cat}
+            type="button"
+            onClick={() => setFilterCategoria(cat)}
+            className={
+              filterCategoria === cat
+                ? "rounded-lg cursor-pointer bg-surface px-2.5 py-1 text-xs font-medium text-text"
+                : "rounded-lg cursor-pointer px-2.5 py-1 text-xs text-text-muted hover:bg-surface"
+            }
+          >
+            {t(`category.${cat}`)}
+          </button>
+        ))}
       </div>
 
       {filtered.length === 0 ? (
         <EmptyState
           icon={Target}
-          title="Cap objectiu encara"
-          description="Crea la teva primera fita personal i comença a fer seguiment del progrés."
+          title={t("objectives.noObjectives")}
+          description={t("objectives.noObjectivesDescription")}
           action={
             <Button size="sm" onClick={openCreate}>
               <Plus className="h-4 w-4" aria-hidden />
-              Afegir objectiu
+              {t("objectives.addObjective")}
             </Button>
           }
         />

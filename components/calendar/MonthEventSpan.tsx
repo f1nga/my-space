@@ -1,7 +1,8 @@
 "use client";
 
 import { format } from "date-fns";
-import { ca } from "date-fns/locale";
+import type { Locale as DateFnsLocale } from "date-fns";
+import { useI18n } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
 import type { CalendarItem } from "@/lib/calendar";
 import { getEventVisualRange } from "@/lib/calendar-layout";
@@ -22,10 +23,10 @@ function colorClass(color: string | null): string {
   return colors.emerald;
 }
 
-function formatSpanLabel(item: CalendarItem): string {
+function formatSpanLabel(item: CalendarItem, dateFnsLocale: DateFnsLocale): string {
   const { start, end } = getEventVisualRange(item);
-  const startLabel = format(start, "d MMM", { locale: ca });
-  const endLabel = format(end, "d MMM", { locale: ca });
+  const startLabel = format(start, "d MMM", { locale: dateFnsLocale });
+  const endLabel = format(end, "d MMM", { locale: dateFnsLocale });
   if (startLabel === endLabel) {
     return `Esdeveniment: ${item.title}, ${startLabel}`;
   }
@@ -33,6 +34,7 @@ function formatSpanLabel(item: CalendarItem): string {
 }
 
 export function MonthEventSpan({ segment, onEventClick }: MonthEventSpanProps) {
+  const { dateFnsLocale } = useI18n();
   const { item, startColumn, span, lane, continuesFromPreviousWeek, continuesToNextWeek } =
     segment;
 
@@ -57,7 +59,7 @@ export function MonthEventSpan({ segment, onEventClick }: MonthEventSpanProps) {
           "border-l-2 border-accent-foreground/30 pl-1",
         continuesToNextWeek && "border-r-2 border-accent-foreground/30 pr-1",
       )}
-      aria-label={formatSpanLabel(item)}
+      aria-label={formatSpanLabel(item, dateFnsLocale)}
       title={item.title}
     >
       {item.title}

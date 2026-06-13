@@ -6,6 +6,7 @@ import { Plus, Search } from "lucide-react";
 import { createNote } from "@/lib/actions/notes";
 import { Button } from "@/components/ui/Button";
 import { Input, formFieldSmClass } from "@/components/ui/Field";
+import { useI18n } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
 import { NoteListItem } from "./NoteListItem";
 import type { NoteSummary } from "./types";
@@ -15,6 +16,7 @@ interface NoteListProps {
 }
 
 export function NoteList({ notes }: NoteListProps) {
+  const { t } = useI18n();
   const router = useRouter();
   const pathname = usePathname();
   const activeId = pathname?.match(/^\/notes\/([^/]+)/)?.[1] ?? null;
@@ -34,7 +36,7 @@ export function NoteList({ notes }: NoteListProps) {
   function handleCreate() {
     startTransition(async () => {
       const result = await createNote({
-        title: "Nota sense titol",
+        title: t("dashboard.defaultNoteTitle"),
         content: "",
         pinned: false,
       });
@@ -56,8 +58,8 @@ export function NoteList({ notes }: NoteListProps) {
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Cercar"
-            aria-label="Cercar notes"
+            placeholder={t("common.search")}
+            aria-label={t("notes.searchNotes")}
             className={cn(formFieldSmClass, "pl-8")}
           />
         </div>
@@ -65,7 +67,7 @@ export function NoteList({ notes }: NoteListProps) {
           size="sm"
           onClick={handleCreate}
           disabled={pending}
-          aria-label="Nova nota"
+          aria-label={t("notes.newNote")}
         >
           <Plus className="h-3.5 w-3.5" aria-hidden />
         </Button>
@@ -73,7 +75,7 @@ export function NoteList({ notes }: NoteListProps) {
       <div className="flex-1 space-y-1 overflow-y-auto pr-1">
         {filtered.length === 0 ? (
           <p className="px-3 py-6 text-center text-xs text-[var(--color-text-subtle)]">
-            Cap nota coincideix.
+            {t("notes.noMatch")}
           </p>
         ) : (
           filtered.map((note) => (

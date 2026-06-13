@@ -1,10 +1,10 @@
 "use client";
 
 import { format } from "date-fns";
-import { ca } from "date-fns/locale";
 import Link from "next/link";
 import { Dialog } from "@/components/ui/Dialog";
-import { cn, formatTimeCa } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n/client";
+import { cn, formatTime } from "@/lib/utils";
 import type { CalendarItem } from "@/lib/calendar";
 import { toISODate } from "@/lib/calendar";
 import type { EventColor } from "@/lib/types";
@@ -33,8 +33,10 @@ export function DayItemsPopover({
   items,
   onEventClick,
 }: DayItemsPopoverProps) {
-  const title = format(day, "EEEE d MMMM", { locale: ca }).replace(/^./, (c) =>
-    c.toUpperCase(),
+  const { dateFnsLocale, intlLocale } = useI18n();
+  const title = format(day, "EEEE d MMMM", { locale: dateFnsLocale }).replace(
+    /^./,
+    (c) => c.toUpperCase(),
   );
 
   return (
@@ -68,7 +70,7 @@ export function DayItemsPopover({
                   aria-hidden
                 />
                 <span className="min-w-0 flex-1 truncate">
-                  {!item.allDay ? `${formatTimeCa(item.startsAt)} ` : ""}
+                  {!item.allDay ? `${formatTime(item.startsAt, intlLocale)} ` : ""}
                   {item.title}
                 </span>
               </button>

@@ -2,13 +2,14 @@
 
 import { useState } from "react";
 import { format } from "date-fns";
-import { ca } from "date-fns/locale";
+import type { Locale as DateFnsLocale } from "date-fns";
 import { Dialog } from "@/components/ui/Dialog";
 import { Button } from "@/components/ui/Button";
 import { deleteEvent } from "@/lib/actions/events";
 import { ConfirmDialogHost } from "@/components/ui/ConfirmDialog";
 import { useConfirmDialog } from "@/components/ui/useConfirmDialog";
-import { cn, formatTimeCa } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n/client";
+import { cn, formatTime } from "@/lib/utils";
 import { EVENT_COLORS, type EventColor } from "@/lib/types";
 import { EVENT_COLOR_CLASSES } from "./eventColors";
 import type { EventSnapshot } from "./types";
@@ -27,23 +28,33 @@ function normalizeColor(value: string | null): EventColor {
   return "emerald";
 }
 
-function formatEventRange(event: EventSnapshot): string {
+function formatEventRange(
+  event: EventSnapshot,
+  dateFnsLocale: DateFnsLocale,
+  intlLocale: string,
+): string {
   if (event.allDay) {
-    const start = format(event.startsAt, "EEEE d MMMM yyyy", { locale: ca });
+    const start = format(event.startsAt, "EEEE d MMMM yyyy", {
+      locale: dateFnsLocale,
+    });
     if (
       event.endsAt &&
       event.startsAt.toDateString() !== event.endsAt.toDateString()
     ) {
-      const end = format(event.endsAt, "EEEE d MMMM yyyy", { locale: ca });
+      const end = format(event.endsAt, "EEEE d MMMM yyyy", {
+        locale: dateFnsLocale,
+      });
       return `${start} – ${end}`;
     }
     return start;
   }
 
-  const datePart = format(event.startsAt, "EEEE d MMMM yyyy", { locale: ca });
-  const startTime = formatTimeCa(event.startsAt);
+  const datePart = format(event.startsAt, "EEEE d MMMM yyyy", {
+    locale: dateFnsLocale,
+  });
+  const startTime = formatTime(event.startsAt, intlLocale);
   if (event.endsAt) {
-    const endTime = formatTimeCa(event.endsAt);
+    const endTime = formatTime(event.endsAt, intlLocale);
     return `${datePart}, ${startTime} – ${endTime}`;
   }
   return `${datePart}, ${startTime}`;
@@ -55,6 +66,7 @@ export function EventDetailDialog({
   event,
   onEdit,
 }: EventDetailDialogProps) {
+  const { t, dateFnsLocale, intlLocale } = useI18n();
   const [error, setError] = useState<string | null>(null);
   const { confirm, dialogProps } = useConfirmDialog();
 
@@ -69,9 +81,8 @@ export function EventDetailDialog({
 
   function handleDeleteRequest() {
     confirm({
-      title: "Eliminar esdeveniment",
-      description:
-        "Vols eliminar aquest esdeveniment? Aquesta acció no es pot desfer.",
+      title: t("confirm.deleteEventTitle"),
+      description: t("confirm.deleteEventDescription"),
       onConfirm: async () => {
         const result = await deleteEvent(event!.id);
         if (!result.ok) {
@@ -89,7 +100,7 @@ export function EventDetailDialog({
         open={open}
         onClose={handleClose}
         title={event.title}
-        description="Detalls de l'esdeveniment"
+        description={t("calendar.eventDetails")}
       >
         <div className="space-y-4">
           <div className="flex items-center gap-2">
@@ -101,14 +112,14 @@ export function EventDetailDialog({
               aria-hidden
             />
             <p className="text-sm text-text-muted">
-              {formatEventRange(event)}
+              {formatEventRange(event, dateFnsLocale, intlLocale)}
             </p>
           </div>
 
           {event.description ? (
             <div className="space-y-1">
               <p className="text-xs font-medium text-text-subtle">
-                Descripcio
+                {t("common.description")}
               </p>
               <p className="whitespace-pre-wrap text-sm text-text">
                 {event.description}
@@ -116,7 +127,7 @@ export function EventDetailDialog({
             </div>
           ) : (
             <p className="text-sm italic text-text-subtle">
-              Sense descripcio
+              {t("common.noDescription")}
             </p>
           )}
 
@@ -136,7 +147,7 @@ export function EventDetailDialog({
               size="sm"
               onClick={handleDeleteRequest}
             >
-              Eliminar
+              {t("common.delete")}
             </Button>
             <div className="flex gap-2">
               <Button
@@ -145,14 +156,14 @@ export function EventDetailDialog({
                 size="sm"
                 onClick={handleClose}
               >
-                Tancar
+                {t("common.close")}
               </Button>
               <Button
                 type="button"
                 size="sm"
                 onClick={() => onEdit(event)}
               >
-                Editar
+                {t("common.edit")}
               </Button>
             </div>
           </footer>

@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { cn, formatTimeCa } from "@/lib/utils";
+import { cn, formatTime } from "@/lib/utils";
 import type { CalendarItem } from "@/lib/calendar";
 import type { EventColor } from "@/lib/types";
+import { useI18n } from "@/lib/i18n/client";
 import { EVENT_COLOR_CLASSES } from "./eventColors";
 
 interface CalendarItemChipProps {
@@ -25,15 +26,17 @@ export function CalendarItemChip({
   onEventClick,
   compact = false,
 }: CalendarItemChipProps) {
+  const { t, intlLocale } = useI18n();
+
   const label =
     item.kind === "event"
-      ? `Esdeveniment: ${item.title}`
-      : `Tasca: ${item.title}`;
+      ? t("calendar.eventLabel", { title: item.title })
+      : t("calendar.taskLabel", { title: item.title });
 
   const content = (
     <>
       {!item.allDay && item.kind === "event" && !compact
-        ? `${formatTimeCa(item.startsAt)} `
+        ? `${formatTime(item.startsAt, intlLocale)} `
         : ""}
       {item.title}
     </>

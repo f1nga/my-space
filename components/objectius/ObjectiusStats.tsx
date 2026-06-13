@@ -1,6 +1,9 @@
+"use client";
+
 import { Card } from "@/components/ui/Card";
 import { Flame, Target, Trophy } from "lucide-react";
-import { motivationMessage } from "@/lib/objectius";
+import { useI18n } from "@/lib/i18n/client";
+import { getMotivationMessage } from "@/lib/i18n/helpers";
 import type { ObjectiusStatsView } from "./types";
 
 interface ObjectiusStatsProps {
@@ -50,7 +53,8 @@ function ProgressRing({ value }: { value: number }) {
 }
 
 export function ObjectiusStats({ stats }: ObjectiusStatsProps) {
-  const message = motivationMessage(stats.taxaCompletacio, stats.actius);
+  const { t } = useI18n();
+  const message = getMotivationMessage(t, stats.taxaCompletacio, stats.actius);
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -63,13 +67,13 @@ export function ObjectiusStats({ stats }: ObjectiusStatsProps) {
             </span>
             <div>
               <p className="text-xs uppercase tracking-wider text-[var(--color-text-subtle)]">
-                Objectius actius
+                {t("objectives.statsActiveLabel")}
               </p>
               <p className="text-3xl font-semibold tracking-tight text-[var(--color-text)]">
                 {stats.actius}
               </p>
               <p className="text-xs text-[var(--color-text-muted)]">
-                {stats.total} en total
+                {t("objectives.statsInTotal", { count: stats.total })}
               </p>
             </div>
           </div>
@@ -81,10 +85,10 @@ export function ObjectiusStats({ stats }: ObjectiusStatsProps) {
           <ProgressRing value={stats.taxaCompletacio} />
           <div>
             <p className="text-xs uppercase tracking-wider text-[var(--color-text-subtle)]">
-              Taxa de completació
+              {t("objectives.statsCompletionRate")}
             </p>
             <p className="text-sm font-medium text-[var(--color-text-muted)]">
-              {stats.completats} completats
+              {t("objectives.statsCompletedCount", { count: stats.completats })}
             </p>
           </div>
         </div>
@@ -99,11 +103,11 @@ export function ObjectiusStats({ stats }: ObjectiusStatsProps) {
             </span>
             <div className="min-w-0">
               <p className="text-xs uppercase tracking-wider text-[var(--color-text-subtle)]">
-                Motivació
+                {t("objectives.statsMotivation")}
               </p>
               <p className="flex items-center gap-1.5 text-lg font-semibold text-[var(--color-text)]">
                 <Trophy className="h-4 w-4 text-[var(--color-warning)]" aria-hidden />
-                {stats.ratxaMotivacio} fites
+                {t("objectives.statsMilestones", { count: stats.ratxaMotivacio })}
               </p>
               <p className="truncate text-xs text-[var(--color-text-muted)]">
                 {message}

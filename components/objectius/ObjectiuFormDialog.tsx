@@ -6,11 +6,8 @@ import { Button } from "@/components/ui/Button";
 import { Dialog } from "@/components/ui/Dialog";
 import { Input, Select, Textarea } from "@/components/ui/Field";
 import { createObjectiu, updateObjectiu } from "@/lib/actions/objectius";
-import {
-  CATEGORIA_OBJECTIU_LABELS,
-  CATEGORIES_OBJECTIU,
-  type CategoriaObjectiu,
-} from "@/lib/types";
+import { useI18n } from "@/lib/i18n/client";
+import { CATEGORIES_OBJECTIU, type CategoriaObjectiu } from "@/lib/types";
 import type { ObjectiuView } from "./types";
 
 interface ObjectiuFormDialogProps {
@@ -30,6 +27,7 @@ export function ObjectiuFormDialog({
   onClose,
   objectiu,
 }: ObjectiuFormDialogProps) {
+  const { t } = useI18n();
   const editing = Boolean(objectiu);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -74,7 +72,7 @@ export function ObjectiuFormDialog({
     };
 
     if (!payload.titol) {
-      setError("Cal un títol per a l'objectiu.");
+      setError(t("objectives.formTitleRequired"));
       return;
     }
 
@@ -95,11 +93,11 @@ export function ObjectiuFormDialog({
     <Dialog
       open={open}
       onClose={onClose}
-      title={editing ? "Editar objectiu" : "Afegir objectiu"}
+      title={editing ? t("objectives.formEditTitle") : t("objectives.formNewTitle")}
       description={
         editing
-          ? "Actualitza les dades de l'objectiu seleccionat."
-          : "Defineix una nova fita personal amb dates i subtasques."
+          ? t("objectives.formEditDescriptionAlt")
+          : t("objectives.formNewDescriptionAlt")
       }
       size="lg"
     >
@@ -109,7 +107,7 @@ export function ObjectiuFormDialog({
             htmlFor="objectiu-titol"
             className="text-xs font-medium text-text-muted"
           >
-            Títol
+            {t("objectives.formTitle")}
           </label>
           <Input
             id="objectiu-titol"
@@ -119,7 +117,7 @@ export function ObjectiuFormDialog({
             autoFocus
             required
             maxLength={200}
-            placeholder="Per exemple, estalviar 3.000 €"
+            placeholder={t("objectives.formTitlePlaceholder")}
           />
         </div>
 
@@ -128,7 +126,7 @@ export function ObjectiuFormDialog({
             htmlFor="objectiu-descripcio"
             className="text-xs font-medium text-text-muted"
           >
-            Descripció
+            {t("objectives.formDescription")}
           </label>
           <Textarea
             id="objectiu-descripcio"
@@ -137,7 +135,7 @@ export function ObjectiuFormDialog({
             rows={3}
             maxLength={2000}
             className="resize-none"
-            placeholder="Detalls opcionals sobre la fita..."
+            placeholder={t("objectives.formDescriptionPlaceholder")}
           />
         </div>
 
@@ -147,7 +145,7 @@ export function ObjectiuFormDialog({
               htmlFor="objectiu-inici"
               className="text-xs font-medium text-text-muted"
             >
-              Data d&apos;inici
+              {t("objectives.formStartDate")}
             </label>
             <Input
               id="objectiu-inici"
@@ -162,7 +160,7 @@ export function ObjectiuFormDialog({
               htmlFor="objectiu-final"
               className="text-xs font-medium text-text-muted"
             >
-              Data final
+              {t("objectives.formEndDate")}
             </label>
             <Input
               id="objectiu-final"
@@ -180,7 +178,7 @@ export function ObjectiuFormDialog({
               htmlFor="objectiu-categoria"
               className="text-xs font-medium text-text-muted"
             >
-              Categoria
+              {t("objectives.formCategory")}
             </label>
             <Select
               id="objectiu-categoria"
@@ -191,7 +189,7 @@ export function ObjectiuFormDialog({
             >
               {CATEGORIES_OBJECTIU.map((cat) => (
                 <option key={cat} value={cat}>
-                  {CATEGORIA_OBJECTIU_LABELS[cat]}
+                  {t(`category.${cat}`)}
                 </option>
               ))}
             </Select>
@@ -203,7 +201,7 @@ export function ObjectiuFormDialog({
                 htmlFor="objectiu-progress"
                 className="text-xs font-medium text-text-muted"
               >
-                Progrés ({progress}%)
+                {t("objectives.progressPercent", { percent: progress })}
               </label>
               <input
                 id="objectiu-progress"
@@ -222,7 +220,7 @@ export function ObjectiuFormDialog({
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <p className="text-xs font-medium text-text-muted">
-                Subtasques (opcional)
+                {t("objectives.subtasksOptional")}
               </p>
               <button
                 type="button"
@@ -230,7 +228,7 @@ export function ObjectiuFormDialog({
                 className="inline-flex items-center gap-1 text-xs font-medium text-accent hover:underline"
               >
                 <Plus className="h-3.5 w-3.5" aria-hidden />
-                Afegir
+                {t("common.add")}
               </button>
             </div>
             <div className="space-y-2">
@@ -247,13 +245,15 @@ export function ObjectiuFormDialog({
                       )
                     }
                     maxLength={200}
-                    placeholder={`Subtasca ${index + 1}`}
+                    placeholder={t("objectives.subtaskNumber", {
+                      number: index + 1,
+                    })}
                     className="flex-1"
                   />
                   {subtasques.length > 1 ? (
                     <button
                       type="button"
-                      aria-label="Eliminar subtasca"
+                      aria-label={t("objectives.deleteSubtask")}
                       onClick={() =>
                         setSubtasques((prev) =>
                           prev.filter((_, i) => i !== index),
@@ -278,14 +278,14 @@ export function ObjectiuFormDialog({
 
         <div className="flex justify-end gap-2 pt-2">
           <Button type="button" variant="ghost" size="sm" onClick={onClose}>
-            Cancel·lar
+            {t("common.cancel")}
           </Button>
           <Button type="submit" size="sm" disabled={pending}>
             {pending
-              ? "Desant..."
+              ? t("common.saving")
               : editing
-                ? "Desar canvis"
-                : "Crear objectiu"}
+                ? t("common.saveChanges")
+                : t("objectives.createObjective")}
           </Button>
         </div>
       </form>

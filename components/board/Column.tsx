@@ -8,8 +8,8 @@ import {
 } from "@dnd-kit/sortable";
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
+import { useI18n } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
-import { TASK_STATUS_LABELS } from "@/lib/types";
 import type { TaskStatus } from "@/lib/types";
 import type { BoardTask, BoardView } from "./types";
 import { TaskCard } from "./TaskCard";
@@ -29,6 +29,8 @@ const accentByStatus: Record<TaskStatus, string> = {
 };
 
 export function Column({ status, tasks, boards, defaultBoardId }: ColumnProps) {
+  const { t } = useI18n();
+  const statusLabel = t(`taskStatus.${status}`);
   const { setNodeRef, isOver } = useDroppable({
     id: `column-${status}`,
     data: { type: "column", status },
@@ -49,7 +51,7 @@ export function Column({ status, tasks, boards, defaultBoardId }: ColumnProps) {
             className={cn("h-2 w-2 rounded-full", accentByStatus[status])}
           />
           <h3 className="text-sm font-semibold tracking-tight text-[var(--color-text)]">
-            {TASK_STATUS_LABELS[status]}
+            {statusLabel}
           </h3>
           <span className="rounded-md bg-[var(--color-surface)] px-2 py-0.5 text-xs text-[var(--color-text-muted)]">
             {tasks.length}
@@ -58,7 +60,7 @@ export function Column({ status, tasks, boards, defaultBoardId }: ColumnProps) {
         <button
           type="button"
           onClick={() => setCreateOpen(true)}
-          aria-label={`Nova tasca a ${TASK_STATUS_LABELS[status]}`}
+          aria-label={t("board.newTaskInColumn", { column: statusLabel })}
           className="rounded-md p-1 text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-surface)] hover:text-[var(--color-text)]"
         >
           <Plus className="h-4 w-4" aria-hidden />
@@ -84,7 +86,7 @@ export function Column({ status, tasks, boards, defaultBoardId }: ColumnProps) {
             onClick={() => setCreateOpen(true)}
             className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-[var(--color-border)] py-8 text-xs text-[var(--color-text-subtle)] transition-colors hover:border-[var(--color-border-strong)] hover:text-[var(--color-text-muted)]"
           >
-            <Plus className="h-3.5 w-3.5" aria-hidden /> Afegir tasca
+            <Plus className="h-3.5 w-3.5" aria-hidden /> {t("board.addTask")}
           </button>
         ) : (
           <Button
@@ -94,7 +96,7 @@ export function Column({ status, tasks, boards, defaultBoardId }: ColumnProps) {
             className="w-full justify-start"
             onClick={() => setCreateOpen(true)}
           >
-            <Plus className="h-3.5 w-3.5" aria-hidden /> Afegir tasca
+            <Plus className="h-3.5 w-3.5" aria-hidden /> {t("board.addTask")}
           </Button>
         )}
       </div>

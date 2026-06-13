@@ -16,6 +16,7 @@ import {
 } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { moveTask } from "@/lib/actions/tasks";
+import { useI18n } from "@/lib/i18n/client";
 import { TASK_STATUSES } from "@/lib/types";
 import type { TaskStatus } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -75,6 +76,7 @@ function filterGroupsByBoard(
 }
 
 export function BoardClient({ initial, initialBoards }: BoardClientProps) {
+  const { t } = useI18n();
   const [groups, setGroups] = useState<GroupedTasks>(initial);
   const [boards, setBoards] = useState<BoardView[]>(initialBoards);
   const [trackedInitial, setTrackedInitial] = useState(initial);
@@ -211,13 +213,13 @@ export function BoardClient({ initial, initialBoards }: BoardClientProps) {
   return (
     <div className="space-y-5">
       <nav
-        aria-label="Filtra per espai de treball"
+        aria-label={t("board.filterLabel")}
         className="flex flex-wrap items-center gap-2"
       >
         <BoardPill
           active={activeBoard === "tots"}
           onClick={() => setActiveBoard("tots")}
-          label="Tots"
+          label={t("common.all")}
         />
         {boards.map((board) => (
           <BoardPill
@@ -230,7 +232,7 @@ export function BoardClient({ initial, initialBoards }: BoardClientProps) {
         <button
           type="button"
           onClick={() => setCreateBoardOpen(true)}
-          aria-label="Afegir tauler"
+          aria-label={t("board.addBoard")}
           className="flex h-8 w-8 items-center justify-center rounded-full border border-dashed border-[var(--color-border)] text-[var(--color-text-muted)] transition-all duration-200 hover:border-[var(--color-accent-ring)] hover:bg-[var(--color-surface)] hover:text-[var(--color-accent)] cursor-pointer"
         >
           <Plus className="h-3.5 w-3.5" aria-hidden />

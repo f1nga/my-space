@@ -7,7 +7,9 @@ import { useState } from "react";
 import { deleteTask } from "@/lib/actions/tasks";
 import { ConfirmDialogHost } from "@/components/ui/ConfirmDialog";
 import { useConfirmDialog } from "@/components/ui/useConfirmDialog";
-import { cn, formatTimeCa } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n/client";
+import type { Translator } from "@/lib/i18n/types";
+import { cn, formatTime } from "@/lib/utils";
 import type { BoardTask, BoardView } from "./types";
 import { TaskFormDialog } from "./TaskFormDialog";
 
@@ -17,24 +19,31 @@ interface TaskCardProps {
   isOverlay?: boolean;
 }
 
-function relativeDueLabel(date: Date): { text: string; tone: "danger" | "warning" | "muted" } {
+function relativeDueLabel(
+  date: Date,
+  t: Translator,
+  intlLocale: string,
+): { text: string; tone: "danger" | "warning" | "muted" } {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const target = new Date(date);
   const targetDay = new Date(target.getFullYear(), target.getMonth(), target.getDate());
   const diff = Math.round((targetDay.getTime() - today.getTime()) / 86_400_000);
-  const time = formatTimeCa(target);
-  if (diff < 0) return { text: `Endarrerit · ${time}`, tone: "danger" };
-  if (diff === 0) return { text: `Avui · ${time}`, tone: "warning" };
-  if (diff === 1) return { text: `Dema · ${time}`, tone: "muted" };
-  if (diff < 7) return { text: `En ${diff} dies · ${time}`, tone: "muted" };
+  const time = formatTime(target, intlLocale);
+  if (diff < 0) return { text: `${t("relative.overdue")} · ${time}`, tone: "danger" };
+  if (diff === 0) return { text: `${t("relative.today")} · ${time}`, tone: "warning" };
+  if (diff === 1) return { text: `${t("relative.tomorrow")} · ${time}`, tone: "muted" };
+  if (diff < 7) {
+    return { text: `${t("relative.inDays", { count: diff })} · ${time}`, tone: "muted" };
+  }
   return {
-    text: target.toLocaleDateString("ca-ES", { day: "numeric", month: "short" }),
+    text: target.toLocaleDateString(intlLocale, { day: "numeric", month: "short" }),
     tone: "muted",
   };
 }
 
 export function TaskCard({ task, boards, isOverlay = false }: TaskCardProps) {
+  const { t, intlLocale } = useI18n();
   const {
     attributes,
     listeners,
@@ -52,7 +61,7 @@ export function TaskCard({ task, boards, isOverlay = false }: TaskCardProps) {
     transition,
   };
 
-  const due = task.dueDate ? relativeDueLabel(task.dueDate) : null;
+  const due = task.dueDate ? relativeDueLabel(task.dueDate, t, intlLocale) : null;
 
   return (
     <>
@@ -69,7 +78,7 @@ export function TaskCard({ task, boards, isOverlay = false }: TaskCardProps) {
         <div className="flex items-start gap-2">
           <button
             type="button"
-            aria-label="Arrossega per reordenar"
+            aria-label={t("board.dragToReorder")}
             className="mt-0.5 cursor-grab touch-none rounded p-0.5 text-[var(--color-text-subtle)] opacity-0 transition-opacity hover:bg-[var(--color-surface)] hover:text-[var(--color-text-muted)] group-hover:opacity-100"
             {...attributes}
             {...listeners}
@@ -105,7 +114,7 @@ export function TaskCard({ task, boards, isOverlay = false }: TaskCardProps) {
           <div className="flex shrink-0 flex-col gap-1 opacity-0 transition-opacity group-hover:opacity-100">
             <button
               type="button"
-              aria-label="Editar tasca"
+              aria-label={t("board.editTask")}
               onClick={() => setEditOpen(true)}
               className="rounded p-1 text-[var(--color-text-muted)] hover:bg-[var(--color-surface)] hover:text-[var(--color-text)]"
             >
@@ -113,12 +122,11 @@ export function TaskCard({ task, boards, isOverlay = false }: TaskCardProps) {
             </button>
             <button
               type="button"
-              aria-label="Eliminar tasca"
+              aria-label={t("board.deleteTask")}
               onClick={() =>
                 confirm({
-                  title: "Eliminar tasca",
-                  description:
-                    "Vols eliminar aquesta tasca? Aquesta acció no es pot desfer.",
+                  title: t("confirm.deleteTaskTitle"),
+                  description: t("confirm.deleteTaskDescription"),
                   onConfirm: () => deleteTask(task.id),
                 })
               }

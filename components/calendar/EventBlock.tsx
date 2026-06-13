@@ -1,9 +1,10 @@
 "use client";
 
-import { cn, formatTimeCa } from "@/lib/utils";
+import { cn, formatTime } from "@/lib/utils";
 import type { CalendarItem } from "@/lib/calendar";
 import { eventLayout } from "@/lib/calendar";
 import type { EventColor } from "@/lib/types";
+import { useI18n } from "@/lib/i18n/client";
 import { EVENT_COLOR_CLASSES } from "./eventColors";
 
 interface EventBlockProps {
@@ -21,7 +22,9 @@ function colorClass(color: string | null): string {
 }
 
 export function EventBlock({ item, day, onClick }: EventBlockProps) {
+  const { t, intlLocale } = useI18n();
   const { topPx, heightPx } = eventLayout(item, day);
+  const startTime = formatTime(item.startsAt, intlLocale);
 
   return (
     <button
@@ -35,14 +38,16 @@ export function EventBlock({ item, day, onClick }: EventBlockProps) {
         colorClass(item.color),
       )}
       style={{ top: topPx, height: heightPx, minHeight: 24 }}
-      aria-label={`Esdeveniment: ${item.title}, ${formatTimeCa(item.startsAt)}`}
+      aria-label={t("calendar.eventAria", { title: item.title, time: startTime })}
       title={item.title}
     >
       <span className="block truncate font-semibold">{item.title}</span>
       {heightPx >= 36 ? (
         <span className="block truncate opacity-90">
-          {formatTimeCa(item.startsAt)}
-          {item.endsAt ? ` – ${formatTimeCa(item.endsAt)}` : ""}
+          {startTime}
+          {item.endsAt
+            ? ` – ${formatTime(item.endsAt, intlLocale)}`
+            : ""}
         </span>
       ) : null}
     </button>

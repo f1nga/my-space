@@ -1,7 +1,6 @@
 "use client";
 
 import { format } from "date-fns";
-import { ca } from "date-fns/locale";
 import Link from "next/link";
 import {
   buildWeekGrid,
@@ -14,6 +13,7 @@ import {
   type CalendarItem,
   type SerializedCalendarItem,
 } from "@/lib/calendar";
+import { useI18n } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Calendar } from "lucide-react";
@@ -38,6 +38,7 @@ function WeekDesktopGrid({
   openCreate: (defaultStart?: Date) => void;
   openDetail: (item: CalendarItem) => void;
 }) {
+  const { t, dateFnsLocale } = useI18n();
   const hasAnyItems = days.some(
     (day) => (grouped.get(dayKey(day)) ?? []).length > 0,
   );
@@ -61,14 +62,14 @@ function WeekDesktopGrid({
             href={`/calendar?view=day&date=${toISODate(day)}`}
             className="px-1 py-2 text-center text-[11px] font-medium uppercase tracking-wider text-text-subtle transition-colors hover:text-text"
           >
-            {format(day, "EEE d", { locale: ca })}
+            {format(day, "EEE d", { locale: dateFnsLocale })}
           </Link>
         ))}
       </div>
 
         <div className="mb-2 grid grid-cols-[56px_repeat(7,1fr)] gap-0 border-b border-border/60 pb-2">
         <span className="pr-2 text-right text-[10px] text-text-subtle">
-          Tot el dia
+          {t("common.allDay")}
         </span>
         {days.map((day) => {
           const dayItems = grouped.get(dayKey(day)) ?? [];
@@ -115,8 +116,9 @@ function WeekDesktopGrid({
 }
 
 export function WeekTimeGrid({ date, items }: WeekTimeGridProps) {
+  const { dateFnsLocale } = useI18n();
   const parsedItems = parseCalendarItems(items);
-  const days = buildWeekGrid(date);
+  const days = buildWeekGrid(date, dateFnsLocale);
   const grouped = groupItemsByDay(parsedItems);
 
   return (
@@ -135,7 +137,7 @@ export function WeekTimeGrid({ date, items }: WeekTimeGridProps) {
             {days.map((day) => (
               <div key={dayKey(day)}>
                 <p className="mb-2 text-sm font-medium text-text">
-                  {format(day, "EEEE d MMM", { locale: ca })}
+                  {format(day, "EEEE d MMM", { locale: dateFnsLocale })}
                 </p>
                 <DayTimeline
                   date={day}
