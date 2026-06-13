@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/role-supports-aria-props */
 "use client";
 
 import Link from "next/link";
@@ -8,8 +9,9 @@ import {
   PanelLeft,
   PanelLeftClose,
   Sparkles,
-  StickyNote,
+  SquarePen,
   Target,
+  ClipboardList,
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -24,8 +26,9 @@ type NavItem = {
 
 const NAV: NavItem[] = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/board", label: "Tasques", icon: ClipboardList },
   { href: "/calendar", label: "Calendari", icon: CalendarDays },
-  { href: "/notes", label: "Notes", icon: StickyNote },
+  { href: "/notes", label: "Notes", icon: SquarePen },
   { href: "/objectius", label: "Objectius", icon: Target },
 ];
 
