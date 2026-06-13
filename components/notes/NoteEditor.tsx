@@ -1,9 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { Input, Textarea } from "@/components/ui/Field";
+import { ConfirmDialogHost } from "@/components/ui/ConfirmDialog";
+import { useConfirmDialog } from "@/components/ui/useConfirmDialog";
 import { deleteNote, updateNote } from "@/lib/actions/notes";
 import { cn } from "@/lib/utils";
 import type { NoteDetail } from "./types";
@@ -22,7 +25,7 @@ export function NoteEditor({ note }: NoteEditorProps) {
   const [title, setTitle] = useState(note.title);
   const [content, setContent] = useState(note.content);
   const [feedback, setFeedback] = useState<SaveFeedback>(null);
-  const [pendingDelete, startDelete] = useTransition();
+  const { confirm, dialogProps } = useConfirmDialog();
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Resincronitzacio durant el render quan canvia la nota (patro React 19).
@@ -70,10 +73,14 @@ export function NoteEditor({ note }: NoteEditorProps) {
   }, [dirty, title, content, note.id]);
 
   function handleDelete() {
-    if (!confirm("Vols eliminar aquesta nota?")) return;
-    startDelete(async () => {
-      const result = await deleteNote(note.id);
-      if (result.ok) router.push("/notes");
+    confirm({
+      title: "Eliminar nota",
+      description:
+        "Vols eliminar aquesta nota? Aquesta acció no es pot desfer.",
+      onConfirm: async () => {
+        const result = await deleteNote(note.id);
+        if (result.ok) router.push("/notes");
+      },
     });
   }
 
@@ -92,33 +99,31 @@ export function NoteEditor({ note }: NoteEditorProps) {
           {status === "error" && "Error en desar"}
           {status === "idle" && "Tots els canvis desats"}
         </span>
-        <Button
-          variant="danger"
-          size="sm"
-          onClick={handleDelete}
-          disabled={pendingDelete}
-        >
+        <Button variant="danger" size="sm" onClick={handleDelete}>
           <Trash2 className="h-3.5 w-3.5" aria-hidden /> Eliminar
         </Button>
       </header>
       <div className="flex flex-1 flex-col gap-2 px-6 py-6">
-        <input
+        <Input
           type="text"
+          ghost
           value={title}
           onChange={(event) => setTitle(event.target.value)}
           maxLength={200}
           placeholder="Titol"
           aria-label="Titol de la nota"
-          className="w-full bg-transparent text-2xl font-semibold tracking-tight text-[var(--color-text)] placeholder:text-[var(--color-text-subtle)] focus:outline-none"
+          className="text-2xl font-semibold tracking-tight text-text placeholder:text-text-subtle"
         />
-        <textarea
+        <Textarea
+          ghost
           value={content}
           onChange={(event) => setContent(event.target.value)}
           placeholder="Comença a escriure…"
           aria-label="Contingut de la nota"
-          className="flex-1 resize-none bg-transparent text-sm leading-relaxed text-[var(--color-text-muted)] placeholder:text-[var(--color-text-subtle)] focus:outline-none"
+          className="flex-1 resize-none text-sm leading-relaxed text-text-muted placeholder:text-text-subtle"
         />
       </div>
+      <ConfirmDialogHost dialogProps={dialogProps} />
     </div>
   );
 }

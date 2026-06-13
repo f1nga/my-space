@@ -5,6 +5,8 @@ import { useRouter, usePathname } from "next/navigation";
 import { Plus, Search } from "lucide-react";
 import { createNote } from "@/lib/actions/notes";
 import { Button } from "@/components/ui/Button";
+import { Input, formFieldSmClass } from "@/components/ui/Field";
+import { cn } from "@/lib/utils";
 import { NoteListItem } from "./NoteListItem";
 import type { NoteSummary } from "./types";
 
@@ -50,13 +52,13 @@ export function NoteList({ notes }: NoteListProps) {
             aria-hidden
             className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[var(--color-text-subtle)]"
           />
-          <input
+          <Input
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Cercar"
             aria-label="Cercar notes"
-            className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] py-1.5 pl-8 pr-3 text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-subtle)] focus:border-[var(--color-accent)] focus:outline-none"
+            className={cn(formFieldSmClass, "pl-8")}
           />
         </div>
         <Button
