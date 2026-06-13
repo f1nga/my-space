@@ -25,6 +25,7 @@ export const taskCreateSchema = z.object({
   title: z.string().trim().min(1, "El titol es obligatori").max(200),
   description: z.string().trim().max(2000).optional().nullable(),
   status: taskStatusSchema.default("todo"),
+  boardId: z.string().min(1, "Cal seleccionar un tauler"),
   dueDate: optionalDate.optional(),
 });
 export type TaskCreateInput = z.infer<typeof taskCreateSchema>;
@@ -40,6 +41,12 @@ export const taskMoveSchema = z.object({
   position: z.number().finite(),
 });
 export type TaskMoveInput = z.infer<typeof taskMoveSchema>;
+
+// ───── Boards (taulers personalitzables) ─────
+export const boardCreateSchema = z.object({
+  name: z.string().trim().min(1, "El nom es obligatori").max(50),
+});
+export type BoardCreateInput = z.infer<typeof boardCreateSchema>;
 
 // ───── Notes ─────
 export const noteCreateSchema = z.object({

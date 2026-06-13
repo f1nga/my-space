@@ -11,18 +11,30 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Board {
+  id        String   @id @default(cuid())
+  name      String
+  position  Float    @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  tasks     Task[]
+}
+
 model Task {
   id          String    @id @default(cuid())
   title       String
   description String?
   // "todo" | "doing" | "done" — SQLite no suporta enum; validem amb Zod a lib/types.ts
   status      String    @default("todo")
+  boardId     String
+  board       Board     @relation(fields: [boardId], references: [id], onDelete: Restrict)
   position    Float     @default(0)
   dueDate     DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
   @@index([status, position])
+  @@index([boardId])
 }
 
 model Note {

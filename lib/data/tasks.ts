@@ -9,6 +9,7 @@ export async function getTasksGroupedByStatus(): Promise<
   Record<TaskStatus, NonNullable<TaskRecord>[]>
 > {
   const tasks = await prisma.task.findMany({
+    include: { board: true },
     orderBy: [{ position: "asc" }, { createdAt: "asc" }],
   });
 

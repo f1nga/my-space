@@ -15,6 +15,11 @@ async function main() {
   await prisma.event.deleteMany();
   await prisma.note.deleteMany();
   await prisma.task.deleteMany();
+  await prisma.board.deleteMany();
+
+  const generalBoard = await prisma.board.create({
+    data: { name: "General", position: 0 },
+  });
 
   await prisma.task.createMany({
     data: [
@@ -22,6 +27,7 @@ async function main() {
         title: "Llegir documentacio de Next 16",
         description: "Revisar app router i server actions",
         status: "todo",
+        boardId: generalBoard.id,
         position: 1024,
         dueDate: daysFromToday(2, 18),
       },
@@ -29,23 +35,27 @@ async function main() {
         title: "Esbossar paleta de colors",
         description: "Definir tokens a globals.css",
         status: "todo",
+        boardId: generalBoard.id,
         position: 2048,
       },
       {
         title: "Configurar Prisma amb SQLite",
         description: "Migracio inicial i seed",
         status: "doing",
+        boardId: generalBoard.id,
         position: 1024,
       },
       {
         title: "Implementar Sidebar",
         status: "doing",
+        boardId: generalBoard.id,
         position: 2048,
         dueDate: daysFromToday(1, 12),
       },
       {
         title: "Crear repositori al Git",
         status: "done",
+        boardId: generalBoard.id,
         position: 1024,
       },
     ],

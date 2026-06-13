@@ -37,6 +37,7 @@ export async function createTask(input: unknown): Promise<ActionResult> {
         title: data.title,
         description: data.description ?? null,
         status: data.status,
+        boardId: data.boardId,
         dueDate: data.dueDate ?? null,
         position,
       },
@@ -61,6 +62,7 @@ export async function updateTask(input: unknown): Promise<ActionResult> {
           description: rest.description ?? null,
         }),
         ...(rest.status !== undefined && { status: rest.status }),
+        ...(rest.boardId !== undefined && { boardId: rest.boardId }),
         ...(rest.dueDate !== undefined && { dueDate: rest.dueDate ?? null }),
       },
     });
